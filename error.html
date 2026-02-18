@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seite nicht gefunden - Buff Studio</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        .error-container {
+            max-width: 800px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .error-card {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 20px;
+            padding: 50px 40px;
+            border: 2px solid rgba(255, 71, 87, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .error-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+        }
+
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .error-title {
+            color: #ff4757;
+            font-size: 48px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .error-subtitle {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .error-description {
+            color: #aaa;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .error-code {
+            background: rgba(255, 71, 87, 0.1);
+            color: #ff4757;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-bottom: 30px;
+            display: inline-block;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .error-contact {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-title {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .contact-email {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .contact-email:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .error-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .suggestions {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .suggestions-title {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .suggestion-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .suggestion-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .suggestion-item a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+        }
+
+        .suggestion-item a:hover {
+            text-decoration: underline;
+        }
+
+        .signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .error-container {
+                margin: 100px auto 30px;
+            }
+            
+            .error-card {
+                padding: 30px 20px;
+            }
+            
+            .error-title {
+                font-size: 36px;
+            }
+            
+            .error-subtitle {
+                font-size: 20px;
+            }
+            
+            .error-actions {
+                flex-direction: column;
+            }
+            
+            .error-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Glitch Effect für den Error Code */
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: "404";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff4757;
+            animation: glitch-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: 2px 0 #667eea;
+            animation: glitch-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-1 {
+            0% { clip-path: inset(20% 0 80% 0); }
+            20% { clip-path: inset(60% 0 40% 0); }
+            40% { clip-path: inset(30% 0 70% 0); }
+            60% { clip-path: inset(80% 0 20% 0); }
+            80% { clip-path: inset(10% 0 90% 0); }
+            100% { clip-path: inset(50% 0 50% 0); }
+        }
+
+        @keyframes glitch-2 {
+            0% { clip-path: inset(80% 0 20% 0); }
+            20% { clip-path: inset(10% 0 90% 0); }
+            40% { clip-path: inset(40% 0 60% 0); }
+            60% { clip-path: inset(70% 0 30% 0); }
+            80% { clip-path: inset(20% 0 80% 0); }
+            100% { clip-path: inset(90% 0 10% 0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Startseite</a></li>
+            <li><a href="aboutus.html">Über uns</a></li>
+            <li><a href="team.html">Unser Team</a></li>
+            <li><a href="games.html">Spiele</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <!-- Admin Link - wird nur für Admins angezeigt -->
+            <li id="adminNavItem" style="display: none;">
+                <a href="shopadmin.html" style="color: #FFD700;">Admin</a>
+            </li>
+            <!-- Live Event Button - wird nur bei aktiven Events angezeigt -->
+            <li id="liveEventNavItem" style="display: none;">
+                <a href="live-event.html" style="color: #ff4757; font-weight: bold; animation: pulse 2s infinite;">
+                    🔴 LIVE Event
+                </a>
+            </li>
+            <li class="login-nav-item">
+                <!-- Wird durch JavaScript gefüllt -->
+            </li>
+            <li class="balance-nav-item" style="display: none;">
+                <a href="javascript:void(0)" style="color: #FFD700; font-weight: bold;">
+                    💰 <span id="navBalance">0,00</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="error-container">
+        <div class="error-card">
+            <div class="error-icon">🚧</div>
+            <h1 class="error-title glitch">404</h1>
+            <h2 class="error-subtitle">Seite nicht gefunden</h2>
+            <p class="error-description">
+                Oops! Die Seite, die du suchst, existiert nicht oder wurde verschoben.
+            </p>
+            
+            <div class="error-code">
+                Fehlercode: 404 - PAGE_NOT_FOUND
+            </div>
+
+            <div class="error-contact">
+                <div class="contact-title">Kannst du uns helfen, den Fehler zu finden?</div>
+                <a href="mailto:supbuffstudio@outlook.com" class="contact-email">
+                    📧 supbuffstudio@outlook.com
+                </a>
+                <p style="color: #aaa; margin-top: 10px; font-size: 14px;">
+                    Beschreibe uns bitte, wie du zu dieser Seite gekommen bist.
+                </p>
+            </div>
+
+            <div class="error-actions">
+                <a href="index.html" class="error-btn primary-btn">
+                    🏠 Zur Startseite
+                </a>
+                <a href="javascript:history.back()" class="error-btn secondary-btn">
+                    ↩️ Zurück
+                </a>
+                <button onclick="location.reload()" class="error-btn secondary-btn">
+                    🔄 Seite neu laden
+                </button>
+            </div>
+
+            <div class="suggestions">
+                <h3 class="suggestions-title">Vielleicht suchst du eine dieser Seiten:</h3>
+                <div class="suggestion-list">
+                    <div class="suggestion-item">
+                        <a href="games.html">🎮 Unsere Spiele</a>
+                    </div>
+                    <div class="suggestion-item">
+                        <a href="shop.html">🛍️ Shop</a>
+                    </div>
+                    <div class="suggestion-item">
+                        <a href="team.html">👥 Unser Team</a>
+                    </div>
+                    <div class="suggestion-item">
+                        <a href="aboutus.html">ℹ️ Über uns</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="signature">
+                <p>Mit freundlichen Grüßen,<br>-Das Buff Studio Team -</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://rxalirtnxbspphoiriux.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4YWxpcnRueGJzcHBob2lyaXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMDE1ODMsImV4cCI6MjA3NzY3NzU4M30.cepc0jFeVYDwU1k0-qt66Sdig7iVUdqTkvtbGu6jrHY';
+
+        // Supabase Client initialisieren
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+    <script src="common.js"></script>
+
+    <script>
+        // Fehler-Logging (optional)
+        console.error('404 Error: Page not found - URL:', window.location.href);
+        
+        // Navbar Funktionalität
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navbar aktualisieren
+            updateNavbar();
+            
+            // Live Event Status prüfen
+            checkLiveEventStatus();
+        });
+
+        async function checkLiveEventStatus() {
+            try {
+                const { data: events, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .eq('is_active', true)
+                    .gt('end_time', new Date().toISOString())
+                    .single();
+                
+                const liveEventNavItem = document.getElementById('liveEventNavItem');
+                if (liveEventNavItem && events) {
+                    liveEventNavItem.style.display = 'block';
+                }
+            } catch (error) {
+                console.log('Kein aktives Event gefunden');
+            }
+        }
+
+        function updateNavbar() {
+            const loginNavItem = document.querySelector('.login-nav-item');
+            const balanceNavItem = document.querySelector('.balance-nav-item');
+            const adminNavItem = document.getElementById('adminNavItem');
+            
+            if (!loginNavItem) return;
+            
+            // User aus Storage holen
+            const sessionUser = sessionStorage.getItem('current_user');
+            const rememberedUser = localStorage.getItem('remembered_user');
+            const currentUser = sessionUser ? JSON.parse(sessionUser) : 
+                              rememberedUser ? JSON.parse(rememberedUser) : null;
+            
+            if (currentUser) {
+                // Eingeloggt
+                loginNavItem.innerHTML = `
+                    <a href="profile.html" style="color: #4CAF50;">👤 ${currentUser.username}</a>
+                    <a href="#" onclick="logoutUser()" style="color: #ff4757; margin-left: 15px;">Logout</a>
+                `;
+                if (balanceNavItem) {
+                    balanceNavItem.style.display = 'block';
+                    const balanceElement = document.getElementById('navBalance');
+                    if (balanceElement && currentUser.balance) {
+                        balanceElement.textContent = currentUser.balance.toFixed(2);
+                    }
+                }
+                
+                // Admin-Bereich anzeigen für Admins
+                const adminUsers = ['Ungewoehnlicher', 'Lars', 'MAX_YT'];
+                if (adminNavItem && adminUsers.includes(currentUser.username)) {
+                    adminNavItem.style.display = 'block';
+                }
+            } else {
+                // Nicht eingeloggt
+                loginNavItem.innerHTML = `
+                    <a href="login.html">Login</a>
+                    <a href="register.html" style="margin-left: 15px;">Registrieren</a>
+                `;
+                if (balanceNavItem) balanceNavItem.style.display = 'none';
+                if (adminNavItem) adminNavItem.style.display = 'none';
+            }
+        }
+
+        function logoutUser() {
+            if (confirm('Möchtest du dich wirklich abmelden?')) {
+                sessionStorage.removeItem('current_user');
+                localStorage.removeItem('remembered_user');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

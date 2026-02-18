@@ -1,0 +1,3402 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freunde & Chat - Buff Studio</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <!-- PeerJS für Video-Calls -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        nav {
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        nav li {
+            margin: 0;
+        }
+
+        nav a {
+            display: block;
+            padding: 20px 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #667eea;
+        }
+
+        .cart-btn {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .friends-container {
+            max-width: 1200px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+        }
+
+        .friends-card {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 40px;
+        }
+
+        .friends-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .friends-header h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-to-profile {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .back-to-profile:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .friends-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .friends-tab-content {
+            display: none;
+        }
+
+        .friends-tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .friend-chat-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            height: 600px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .friend-list-sidebar {
+            background: rgba(20, 20, 30, 0.9);
+            padding: 25px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+
+        .friend-list-sidebar h4 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .friend-chat-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .friend-chat-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .friend-chat-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+        }
+
+        .friend-chat-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+
+        .friend-chat-item {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.03);
+            position: relative;
+        }
+
+        .friend-chat-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateX(5px);
+        }
+
+        .friend-chat-item.active {
+            background: rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .group-chat-item {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            position: relative;
+        }
+
+        .group-chat-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+
+        .group-chat-item.active {
+            background: rgba(102, 126, 234, 0.25);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .group-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .friend-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .friend-chat-main {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .friend-chat-messages {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-messages-header {
+            padding: 20px 25px;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        #currentChatFriend {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chat-members {
+            color: #aaa;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .call-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .call-action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .video-call-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .voice-call-btn {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .voice-call-btn:hover {
+            background: rgba(46, 213, 115, 0.3);
+        }
+
+        .chat-messages-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            max-height: 400px;
+        }
+
+        .chat-messages-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages-content::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+
+        .chat-messages-content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .friend-message {
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 65%;
+            font-size: 14px;
+            line-height: 1.4;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-sent {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            margin-left: auto;
+            margin-right: 0;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-received {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-right: auto;
+            margin-left: 0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .message-text {
+            color: white;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .friend-chat-input {
+            display: flex;
+            gap: 12px;
+            padding: 20px 25px;
+            background: rgba(0,0,0,0.4);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            line-height: 1.4;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: center;
+            min-width: 100px;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .friend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .friend-item:hover {
+            background: rgba(255,255,255,0.06);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .friend-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .friend-details h4 {
+            color: white;
+            margin: 0 0 6px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .friend-details p {
+            color: #aaa;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .friend-action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .chat-btn {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .chat-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .video-btn {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .video-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .voice-btn {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .voice-btn:hover {
+            background: rgba(46, 213, 115, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .add-friend-form {
+            padding: 35px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: 30px;
+        }
+
+        .add-friend-form h4 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        .message-result {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: 500;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-success {
+            background: rgba(46, 213, 115, 0.15);
+            color: #2ed573;
+            border-color: rgba(46, 213, 115, 0.3);
+        }
+
+        .message-error {
+            background: rgba(255, 71, 87, 0.15);
+            color: #ff4757;
+            border-color: rgba(255, 71, 87, 0.3);
+        }
+
+        .empty-chat, .empty-friends {
+            text-align: center;
+            padding: 50px;
+            color: #aaa;
+        }
+
+        .empty-friends {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .help-button-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .help-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .help-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .help-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30,30,30,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .close-help {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .help-modal-content h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .help-modal-content p {
+            color: whitesmoke;
+            margin-bottom: 15px;
+        }
+
+        .contact-info {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .contact-info p {
+            margin: 8px 0;
+        }
+
+        .help-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .help-links a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            text-align: center;
+            transition: background 0.3s ease;
+        }
+
+        .help-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Gruppen Styles */
+        .groups-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .create-group-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .create-group-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .groups-list {
+            margin-top: 20px;
+        }
+
+        .group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .group-item:hover {
+            background: rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .group-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .group-avatar-large {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .group-details h4 {
+            color: white;
+            margin: 0 0 5px 0;
+            font-size: 18px;
+        }
+
+        .group-details p {
+            color: #aaa;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .group-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .group-action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .group-chat-btn {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .group-chat-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        .group-call-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .group-call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .group-leave-btn {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .group-leave-btn:hover {
+            background: rgba(255, 71, 87, 0.3);
+        }
+
+        /* Modal für Gruppe erstellen */
+        .group-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+        }
+
+        .group-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30,30,30,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .group-modal-content h2 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .group-modal-content input, .group-modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .group-modal-content input:focus, .group-modal-content textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .friends-selector {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .friend-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .friend-checkbox:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .friend-checkbox input {
+            width: auto;
+            margin: 0;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.create {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn.create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .modal-btn.cancel:hover {
+            background: rgba(255, 71, 87, 0.3);
+        }
+
+        /* Call UI */
+        .call-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            width: 400px;
+        }
+
+        .call-container.active {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        .call-container.group-call {
+            width: 800px;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .call-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .call-header h3 {
+            color: white;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .call-participants {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .call-close {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .call-close:hover {
+            color: white;
+        }
+
+        .call-video-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .group-video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .video-item {
+            position: relative;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+
+        .video-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-label {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        #remoteVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #333;
+        }
+
+        #localVideo {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 100px;
+            height: 75px;
+            border-radius: 5px;
+            border: 2px solid #667eea;
+            object-fit: cover;
+            background: #222;
+        }
+
+        .call-info {
+            text-align: center;
+            color: white;
+            margin: 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .call-timer {
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .call-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .call-control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .call-control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .mute-btn {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .mute-btn.muted {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        .video-btn {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .video-btn.off {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        .end-call-btn {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .call-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1999;
+        }
+
+        .call-overlay.active {
+            display: block;
+        }
+
+        .incoming-call-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30, 30, 30, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #667eea;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            z-index: 2500;
+            text-align: center;
+            min-width: 350px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .incoming-call-dialog.active {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        .incoming-call-dialog.group-call {
+            border-color: #764ba2;
+        }
+
+        @keyframes pulse {
+            0% { border-color: #667eea; }
+            50% { border-color: #764ba2; }
+            100% { border-color: #667eea; }
+        }
+
+        .incoming-call-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .incoming-call-dialog h3 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .incoming-call-dialog p {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .incoming-call-participants {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .incoming-call-participants h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .incoming-call-participants ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .incoming-call-participants li {
+            color: white;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+
+        .incoming-call-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .incoming-accept {
+            background: #2ed573;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .incoming-accept:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(46, 213, 115, 0.4);
+        }
+
+        .incoming-reject {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .incoming-reject:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        .call-type-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .call-type-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .call-type-btn.video {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .call-type-btn.voice {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .call-type-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .friends-container {
+                margin: 100px auto 30px;
+                padding: 0 15px;
+            }
+            
+            .friends-card {
+                padding: 25px;
+            }
+            
+            .friends-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .friend-chat-container {
+                grid-template-columns: 1fr;
+                height: 500px;
+            }
+            
+            .friend-list-sidebar {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                max-height: 200px;
+            }
+            
+            .friends-tabs {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .friend-item {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .friend-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .cart-btn {
+                top: 80px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 18px;
+            }
+
+            .call-container {
+                width: 90%;
+                left: 5%;
+                right: 5%;
+            }
+
+            .call-container.group-call {
+                width: 90%;
+            }
+
+            .call-video-container {
+                height: 180px;
+            }
+
+            .group-video-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #localVideo {
+                width: 70px;
+                height: 52px;
+            }
+
+            .incoming-call-dialog {
+                width: 90%;
+                min-width: auto;
+                padding: 20px;
+            }
+
+            .group-modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Startseite</a></li>
+            <li><a href="aboutus.html">Über uns</a></li>
+            <li><a href="team.html">Unser Team</a></li>
+            <li><a href="games.html">Spiele</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li id="adminNavItem" style="display: none;">
+                <a href="shopadmin.html" style="color: #FFD700;">Admin</a>
+            </li>
+            <li id="liveEventNavItem" style="display: none;">
+                <a href="javascript:void(0)" style="color: #ff4757; font-weight: bold;">
+                    🔴 LIVE Event
+                </a>
+            </li>
+            <li class="login-nav-item"></li>
+            <li class="balance-nav-item" style="display: none;">
+                <a href="javascript:void(0)" style="color: #FFD700; font-weight: bold;">
+                    💰 <span id="navBalance">0,00</span>
+                </a>
+            </li>
+            <li id="friendsNavItem" class="friends-nav-item" style="display: none;">
+                <a href="friendsandchat.html">👥 Freunde</a>
+            </li>
+        </ul>
+    </nav>
+
+    <button class="cart-btn" onclick="toggleCart()">
+        🛒
+        <span class="cart-count">0</span>
+    </button>
+
+    <div class="friends-container">
+        <div class="friends-card">
+            <div class="friends-header">
+                <a href="profile.html" class="back-to-profile">← Zurück zum Profil</a>
+                <h1>👥 Freunde & Chat</h1>
+            </div>
+            
+            <div class="friends-tabs">
+                <button class="tab-btn active" onclick="switchTab('friends')">Freunde</button>
+                <button class="tab-btn" onclick="switchTab('requests')">Anfragen</button>
+                <button class="tab-btn" onclick="switchTab('add')">Freund hinzufügen</button>
+                <button class="tab-btn" onclick="switchTab('groups')">Gruppen</button>
+                <button class="tab-btn" onclick="switchTab('chat')">Chat</button>
+            </div>
+            
+            <div class="friends-tab-content active" id="friendsTab">
+                <div id="friendsList">
+                    <div class="empty-friends">
+                        <div class="empty-state-icon">👥</div>
+                        <p>Lade Freunde...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="friends-tab-content" id="requestsTab">
+                <div id="friendRequests">
+                    <div class="empty-friends">
+                        <div class="empty-state-icon">📨</div>
+                        <p>Lade Anfragen...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="friends-tab-content" id="addTab">
+                <div class="add-friend-form">
+                    <h4>Freund hinzufügen</h4>
+                    <p style="color: #aaa; margin-bottom: 25px;">Gib den Benutzernamen ein, um eine Freundschaftsanfrage zu senden.</p>
+                    <div class="input-group">
+                        <input type="text" id="friendUsername" placeholder="Benutzername eingeben..." class="chat-input" required>
+                        <button class="send-btn" onclick="sendFriendRequest()">👤 Anfrage senden</button>
+                    </div>
+                    <div id="addFriendResult"></div>
+                </div>
+            </div>
+            
+            <div class="friends-tab-content" id="groupsTab">
+                <div class="groups-header">
+                    <h3 style="color: white;">Meine Gruppen</h3>
+                    <button class="create-group-btn" onclick="showCreateGroupModal()">➕ Gruppe erstellen</button>
+                </div>
+                <div id="groupsList">
+                    <div class="empty-friends">
+                        <div class="empty-state-icon">👥</div>
+                        <p>Keine Gruppen</p>
+                        <p style="color: #667eea; margin-top: 10px;">Erstelle eine Gruppe um mit mehreren Freunden zu chatten!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="friends-tab-content" id="chatTab">
+                <div class="friend-chat-container">
+                    <div class="friend-list-sidebar">
+                        <h4>Chats</h4>
+                        <div style="margin-bottom: 15px;">
+                            <div style="color: #667eea; font-size: 14px; margin-bottom: 10px;">👥 Gruppen</div>
+                            <div id="groupChatList">
+                                <!-- Gruppen werden hier geladen -->
+                            </div>
+                        </div>
+                        <div>
+                            <div style="color: #667eea; font-size: 14px; margin-bottom: 10px;">👤 Freunde</div>
+                            <div id="friendChatList">
+                                <div class="empty-friends">
+                                    <div class="empty-state-icon">💬</div>
+                                    <p>Lade Freunde...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="friend-chat-main">
+                        <div class="friend-chat-messages">
+                            <div class="chat-messages-header">
+                                <div>
+                                    <span id="currentChatFriend">Wähle einen Chat</span>
+                                    <span class="chat-members" id="chatMembers"></span>
+                                </div>
+                                <div class="call-actions" id="callActions" style="display: none;">
+                                    <button class="call-action-btn video-call-btn" onclick="startCurrentChatCall('video')">
+                                        📹 Video
+                                    </button>
+                                    <button class="call-action-btn voice-call-btn" onclick="startCurrentChatCall('voice')">
+                                        🎤 Voice
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chat-messages-content" id="friendMessagesContent">
+                                <div class="empty-chat">
+                                    <div class="empty-state-icon">💭</div>
+                                    <p>Wähle einen Freund oder eine Gruppe zum Chatten</p>
+                                </div>
+                            </div>
+                            <div class="friend-chat-input">
+                                <textarea id="friendMessageInput" placeholder="Schreibe eine Nachricht..." class="chat-input" rows="1"></textarea>
+                                <button class="send-btn" onclick="sendMessage()">📤 Senden</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gruppe erstellen Modal -->
+    <div class="group-modal" id="createGroupModal">
+        <div class="group-modal-content">
+            <h2>Neue Gruppe erstellen</h2>
+            
+            <input type="text" id="groupName" placeholder="Gruppenname" maxlength="50">
+            <textarea id="groupDescription" placeholder="Gruppenbeschreibung (optional)" rows="3"></textarea>
+            
+            <div style="color: #667eea; margin-bottom: 10px;">Mitglieder auswählen:</div>
+            <div class="friends-selector" id="groupMembersSelector">
+                <!-- Freunde werden hier geladen -->
+                <div style="color: #aaa; text-align: center; padding: 20px;">Lade Freunde...</div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn create" onclick="createGroup()">Erstellen</button>
+                <button class="modal-btn cancel" onclick="hideCreateGroupModal()">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="help-button-container">
+        <button class="help-button" onclick="openHelp()">Du brauchst Hilfe?</button>
+    </div>
+
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-content">
+            <button class="close-help" onclick="closeHelp()">&times;</button>
+            <h3>Hilfe & Support</h3>
+            <p>Bei Problemen oder Fragen kontaktiere uns:</p>
+            <div class="contact-info">
+                <p><strong>Email:</strong> supbuffstudios@outlook.com</p>
+                <p><strong>Probleme:</strong> Freundesfunktion, Chat, Login</p>
+            </div>
+            <div class="help-links">
+                <a href="team.html">Unser Team</a>
+                <a href="aboutus.html">Über Uns</a>
+                <a href="games.html">Unsere Spiele</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="call-overlay" id="callOverlay"></div>
+
+    <!-- Incoming Call Dialog -->
+    <div class="incoming-call-dialog" id="incomingCallDialog">
+        <div class="incoming-call-icon">📞</div>
+        <h3 id="incomingCaller">Unbekannt</h3>
+        <p id="incomingCallText">möchte einen Anruf starten</p>
+        
+        <div id="incomingCallParticipants" class="incoming-call-participants" style="display: none;">
+            <h4>Teilnehmer:</h4>
+            <ul id="incomingCallParticipantsList"></ul>
+        </div>
+        
+        <div class="call-type-selector">
+            <button class="call-type-btn video" onclick="acceptIncomingCall('video')">📹 Video annehmen</button>
+            <button class="call-type-btn voice" onclick="acceptIncomingCall('voice')">🎤 Nur Audio</button>
+        </div>
+        
+        <div class="incoming-call-buttons">
+            <button class="incoming-reject" onclick="rejectIncomingCall()">❌ Ablehnen</button>
+        </div>
+    </div>
+
+    <div class="call-container" id="callContainer">
+        <div class="call-header">
+            <h3 id="callHeader">Video Call</h3>
+            <span class="call-participants" id="callParticipants"></span>
+            <button class="call-close" onclick="endCall()">&times;</button>
+        </div>
+        
+        <div id="callVideoContainer" class="call-video-container">
+            <video id="remoteVideo" autoplay playsinline></video>
+            <video id="localVideo" autoplay playsinline muted></video>
+        </div>
+        
+        <div id="groupVideoGrid" class="group-video-grid" style="display: none;">
+            <!-- Gruppen-Video-Grid wird dynamisch befüllt -->
+        </div>
+        
+        <div class="call-info" id="callInfo">
+            Verbinde...
+            <div class="call-timer" id="callTimer">00:00</div>
+        </div>
+        <div class="call-controls">
+            <button class="call-control-btn mute-btn" id="muteBtn" onclick="toggleMute()">🎤</button>
+            <button class="call-control-btn video-btn" id="videoBtn" onclick="toggleVideo()">📹</button>
+            <button class="call-control-btn end-call-btn" onclick="endCall()">🔴</button>
+        </div>
+    </div>
+
+    <!-- SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="common.js"></script>
+    
+    <script>
+    // Globale Variablen
+    let currentUser = null;
+    let selectedFriend = null;
+    let selectedGroup = null;
+    let supabaseClient = null;
+    let peer = null;
+    let localStream = null;
+    let currentCall = null;
+    let currentGroupCall = null;
+    let pendingCall = null;
+    let isMuted = false;
+    let isVideoOff = false;
+    let callTimer = null;
+    let callSeconds = 0;
+    let peerAvailable = false;
+    let currentCallType = 'video';
+    let groups = [];
+    let groupPeers = new Map(); // Für Gruppenanrufe
+    let groupStreams = new Map(); // Für Remote Streams in Gruppen
+
+    // Beim Laden der Seite
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('📱 Freunde & Chat Seite geladen');
+        
+        // Warte auf Common.js
+        if (!window.CommonJS || !window.CommonJS.getCurrentUser) {
+            console.error('❌ Common.js nicht verfügbar');
+            setTimeout(() => location.reload(), 2000);
+            return;
+        }
+        
+        // User aus Common.js holen
+        currentUser = window.CommonJS.getCurrentUser();
+        
+        if (!currentUser) {
+            alert('Bitte erst einloggen!');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        console.log('✅ User eingeloggt:', currentUser.username);
+        
+        // Warenkorb aktualisieren
+        updateCartDisplay();
+        
+        // Supabase Client
+        supabaseClient = window.CommonJS.getSupabaseClient();
+        
+        // PeerJS initialisieren
+        initPeerJS();
+        
+        // Daten laden
+        loadFriendsList();
+        loadFriendRequests();
+        loadGroups();
+        loadFriendsForChat();
+        loadGroupChats();
+        
+        // Event Listener
+        setupEventListeners();
+        
+        // Chat-Intervall starten
+        startChatInterval();
+    });
+
+    // PeerJS initialisieren
+    function initPeerJS() {
+        try {
+            console.log('🚀 Starte PeerJS...');
+            
+            peer = new Peer(currentUser.username, {
+                host: '0.peerjs.com',
+                port: 443,
+                secure: true,
+                config: {
+                    'iceServers': [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' }
+                    ]
+                }
+            });
+            
+            peer.on('open', (id) => {
+                console.log('✅ PeerJS bereit mit ID:', id);
+                peerAvailable = true;
+                updateOnlineStatusForAllFriends(true);
+            });
+            
+            peer.on('call', (call) => {
+                console.log('📞 Eingehender Call von:', call.peer);
+                
+                // Prüfen ob es ein Gruppenanruf ist
+                const metadata = call.metadata || {};
+                
+                if (metadata.isGroup) {
+                    handleIncomingGroupCall(call, metadata);
+                } else {
+                    // Normaler 1:1 Call
+                    pendingCall = call;
+                    
+                    document.getElementById('incomingCaller').textContent = call.peer;
+                    document.getElementById('incomingCallText').textContent = 'möchte einen Anruf starten';
+                    document.getElementById('incomingCallParticipants').style.display = 'none';
+                    document.getElementById('incomingCallDialog').classList.add('active');
+                    document.getElementById('callOverlay').classList.add('active');
+                }
+            });
+            
+            peer.on('error', (err) => {
+                console.error('❌ PeerJS Fehler:', err);
+                if (err.type === 'unavailable-id') {
+                    console.log('⚠️ ID bereits vergeben - verwende alternative ID');
+                    peer.destroy();
+                    peer = new Peer(currentUser.username + '-' + Math.floor(Math.random() * 1000), {
+                        host: '0.peerjs.com',
+                        port: 443,
+                        secure: true
+                    });
+                }
+            });
+            
+            peer.on('disconnected', () => {
+                console.log('📴 PeerJS getrennt');
+                peerAvailable = false;
+                updateOnlineStatusForAllFriends(false);
+                
+                setTimeout(() => {
+                    if (peer) peer.reconnect();
+                }, 2000);
+            });
+            
+        } catch (error) {
+            console.error('❌ PeerJS Fehler:', error);
+            peerAvailable = false;
+        }
+    }
+
+    // Gruppen laden
+    async function loadGroups() {
+        if (!currentUser || !supabaseClient) return;
+        
+        try {
+            const { data: userGroups, error } = await supabaseClient
+                .from('group_members')
+                .select(`
+                    group_id,
+                    groups:group_id (
+                        id,
+                        name,
+                        description,
+                        created_by,
+                        created_at
+                    )
+                `)
+                .eq('user_id', currentUser.username);
+            
+            if (error) throw error;
+            
+            groups = userGroups.map(ug => ug.groups);
+            
+            const container = document.getElementById('groupsList');
+            
+            if (!groups || groups.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-friends">
+                        <div class="empty-state-icon">👥</div>
+                        <p>Keine Gruppen</p>
+                        <p style="color: #667eea; margin-top: 10px;">Erstelle eine Gruppe um mit mehreren Freunden zu chatten!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            for (const group of groups) {
+                // Mitgliederanzahl laden
+                const { count } = await supabaseClient
+                    .from('group_members')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('group_id', group.id);
+                
+                html += `
+                    <div class="group-item">
+                        <div class="group-info">
+                            <div class="group-avatar-large">${group.name.charAt(0).toUpperCase()}</div>
+                            <div class="group-details">
+                                <h4>${group.name}</h4>
+                                <p>${group.description || 'Keine Beschreibung'} • ${count} Mitglieder</p>
+                            </div>
+                        </div>
+                        <div class="group-actions">
+                            <button class="group-action-btn group-chat-btn" onclick="openGroupChat('${group.id}', '${group.name}')">💬 Chat</button>
+                            <button class="group-action-btn group-call-btn" onclick="startGroupCall('${group.id}', '${group.name}')">📞 Anruf</button>
+                            ${group.created_by === currentUser.username ? 
+                                `<button class="group-action-btn group-leave-btn" onclick="deleteGroup('${group.id}')">🗑️ Löschen</button>` :
+                                `<button class="group-action-btn group-leave-btn" onclick="leaveGroup('${group.id}')">🚪 Verlassen</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Gruppen:', error);
+        }
+    }
+
+    // Gruppen-Chats laden
+    async function loadGroupChats() {
+        if (!currentUser || !supabaseClient) return;
+        
+        try {
+            const { data: userGroups, error } = await supabaseClient
+                .from('group_members')
+                .select(`
+                    group_id,
+                    groups:group_id (
+                        id,
+                        name
+                    )
+                `)
+                .eq('user_id', currentUser.username);
+            
+            if (error) throw error;
+            
+            const container = document.getElementById('groupChatList');
+            
+            if (!userGroups || userGroups.length === 0) {
+                container.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">Keine Gruppen</div>';
+                return;
+            }
+            
+            let html = '';
+            userGroups.forEach(ug => {
+                const group = ug.groups;
+                html += `
+                    <div class="group-chat-item" onclick="selectGroupChat('${group.id}', '${group.name}')">
+                        <div class="group-avatar">${group.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div style="font-weight: 600; color: white;">${group.name}</div>
+                            <div style="color: #aaa; font-size: 12px;">Gruppe</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Gruppen-Chats:', error);
+        }
+    }
+
+    // Gruppe erstellen Modal anzeigen
+    async function showCreateGroupModal() {
+        // Freunde für Auswahl laden
+        try {
+            const { data: friends, error } = await supabaseClient
+                .from('friends')
+                .select('*')
+                .or(`user1.eq.${currentUser.username},user2.eq.${currentUser.username}`)
+                .eq('status', 'accepted');
+            
+            if (error) throw error;
+            
+            const selector = document.getElementById('groupMembersSelector');
+            
+            if (!friends || friends.length === 0) {
+                selector.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">Du hast noch keine Freunde</div>';
+            } else {
+                let html = '';
+                friends.forEach(friend => {
+                    const friendUsername = friend.user1 === currentUser.username ? friend.user2 : friend.user1;
+                    html += `
+                        <label class="friend-checkbox">
+                            <input type="checkbox" value="${friendUsername}">
+                            <span>${friendUsername}</span>
+                        </label>
+                    `;
+                });
+                selector.innerHTML = html;
+            }
+            
+            document.getElementById('createGroupModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Freunde:', error);
+        }
+    }
+
+    // Gruppe erstellen Modal ausblenden
+    function hideCreateGroupModal() {
+        document.getElementById('createGroupModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Gruppe erstellen
+    async function createGroup() {
+        const name = document.getElementById('groupName').value.trim();
+        const description = document.getElementById('groupDescription').value.trim();
+        
+        if (!name) {
+            alert('Bitte gib einen Gruppennamen ein!');
+            return;
+        }
+        
+        // Ausgewählte Mitglieder holen
+        const checkboxes = document.querySelectorAll('#groupMembersSelector input:checked');
+        const members = Array.from(checkboxes).map(cb => cb.value);
+        
+        if (members.length === 0) {
+            alert('Bitte wähle mindestens ein Mitglied aus!');
+            return;
+        }
+        
+        try {
+            // Gruppe in Supabase erstellen
+            const { data: group, error: groupError } = await supabaseClient
+                .from('groups')
+                .insert([{
+                    name: name,
+                    description: description,
+                    created_by: currentUser.username
+                }])
+                .select()
+                .single();
+            
+            if (groupError) throw groupError;
+            
+            // Mitglieder hinzufügen (inkl. Ersteller)
+            const allMembers = [currentUser.username, ...members];
+            const memberInserts = allMembers.map(username => ({
+                group_id: group.id,
+                user_id: username
+            }));
+            
+            const { error: membersError } = await supabaseClient
+                .from('group_members')
+                .insert(memberInserts);
+            
+            if (membersError) throw membersError;
+            
+            alert('✅ Gruppe erfolgreich erstellt!');
+            hideCreateGroupModal();
+            
+            // Gruppen neu laden
+            loadGroups();
+            loadGroupChats();
+            
+        } catch (error) {
+            console.error('Fehler beim Erstellen der Gruppe:', error);
+            alert('Fehler beim Erstellen der Gruppe');
+        }
+    }
+
+    // Gruppe löschen (nur Ersteller)
+    async function deleteGroup(groupId) {
+        if (!confirm('Möchtest du diese Gruppe wirklich löschen?')) return;
+        
+        try {
+            // Erst prüfen ob der User der Ersteller ist
+            const { error } = await supabaseClient
+                .from('groups')
+                .delete()
+                .eq('id', groupId)
+                .eq('created_by', currentUser.username);
+            
+            if (error) throw error;
+            
+            // Gruppen neu laden
+            loadGroups();
+            loadGroupChats();
+            
+        } catch (error) {
+            console.error('Fehler beim Löschen der Gruppe:', error);
+            alert('Fehler beim Löschen der Gruppe');
+        }
+    }
+
+    // Gruppe verlassen
+    async function leaveGroup(groupId) {
+        if (!confirm('Möchtest du diese Gruppe wirklich verlassen?')) return;
+        
+        try {
+            const { error } = await supabaseClient
+                .from('group_members')
+                .delete()
+                .eq('group_id', groupId)
+                .eq('user_id', currentUser.username);
+            
+            if (error) throw error;
+            
+            // Gruppen neu laden
+            loadGroups();
+            loadGroupChats();
+            
+        } catch (error) {
+            console.error('Fehler beim Verlassen der Gruppe:', error);
+            alert('Fehler beim Verlassen der Gruppe');
+        }
+    }
+
+    // Gruppen-Chat auswählen
+    function selectGroupChat(groupId, groupName) {
+        selectedGroup = { id: groupId, name: groupName };
+        selectedFriend = null;
+        
+        document.getElementById('currentChatFriend').textContent = groupName;
+        document.getElementById('chatMembers').textContent = '(Gruppe)';
+        document.getElementById('callActions').style.display = 'flex';
+        
+        // Gruppen-Nachrichten laden
+        loadGroupMessages(groupId);
+    }
+
+    // Gruppen-Nachrichten laden
+    async function loadGroupMessages(groupId) {
+        if (!currentUser || !supabaseClient) return;
+        
+        try {
+            const { data: messages, error } = await supabaseClient
+                .from('group_messages')
+                .select('*')
+                .eq('group_id', groupId)
+                .order('created_at');
+            
+            if (error) throw error;
+            
+            const container = document.getElementById('friendMessagesContent');
+            
+            if (!messages || messages.length === 0) {
+                container.innerHTML = '<div class="empty-chat">💬 Starte die Gruppen-Konversation!</div>';
+                return;
+            }
+            
+            let html = '';
+            messages.forEach(msg => {
+                const isSent = msg.sender === currentUser.username;
+                const time = new Date(msg.created_at).toLocaleTimeString('de-DE', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                html += `
+                    <div class="friend-message ${isSent ? 'message-sent' : 'message-received'}">
+                        <div class="message-header">
+                            <span>${msg.sender}</span>
+                            <span>${time}</span>
+                        </div>
+                        <div class="message-text">${escapeHtml(msg.message)}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Gruppen-Nachrichten:', error);
+        }
+    }
+
+// Verbesserte Gruppen-Call starten Funktion
+async function startGroupCall(groupId, groupName) {
+    if (!peerAvailable || !peer) {
+        alert('⚠️ PeerJS ist nicht verfügbar. Bitte Seite neu laden.');
+        return;
+    }
+    
+    try {
+        // Vorherigen Stream komplett stoppen und freigeben
+        if (localStream) {
+            console.log('📹 Stoppe vorherigen Stream...');
+            localStream.getTracks().forEach(track => {
+                track.stop();
+                console.log(`✅ Vorheriger Track gestoppt: ${track.kind}`);
+            });
+            localStream = null;
+        }
+        
+        // Kurz warten damit die Kamera frei wird
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Gruppenmitglieder holen
+        const { data: members, error } = await supabaseClient
+            .from('group_members')
+            .select('user_id')
+            .eq('group_id', groupId)
+            .neq('user_id', currentUser.username);
+        
+        if (error) throw error;
+        
+        if (!members || members.length === 0) {
+            alert('Keine anderen Mitglieder in der Gruppe');
+            return;
+        }
+        
+        console.log(`👥 Starte Gruppenanruf mit ${members.length} Teilnehmern`);
+        
+        // Zuerst nur mit Audio versuchen, dann wenn das klappt auch Video
+        let stream = null;
+        let videoEnabled = false;
+        
+        try {
+            // Versuche zuerst mit Video
+            stream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'user'
+                }
+            });
+            videoEnabled = true;
+            console.log('✅ Kamera & Mikrofon OK');
+        } catch (videoErr) {
+            console.log('⚠️ Kamera nicht verfügbar, versuche nur Audio...');
+            try {
+                // Wenn Video nicht klappt, nur Audio
+                stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: false
+                });
+                videoEnabled = false;
+                console.log('✅ Nur Mikrofon OK');
+            } catch (audioErr) {
+                console.error('❌ Auch Audio fehlgeschlagen:', audioErr);
+                alert('Kein Mikrofon verfügbar!');
+                return;
+            }
+        }
+        
+        localStream = stream;
+        
+        // Lokales Video anzeigen (nur wenn Video verfügbar)
+        if (videoEnabled) {
+            const localVideo = document.getElementById('localVideo');
+            if (localVideo) {
+                localVideo.srcObject = localStream;
+                try {
+                    await localVideo.play();
+                    console.log('✅ Lokales Video spielt');
+                } catch (e) {
+                    console.log('Local play error:', e);
+                }
+            }
+        } else {
+            // Video-Element leeren bei Audio-Only
+            document.getElementById('localVideo').srcObject = null;
+        }
+        
+        // Gruppenanruf-UI vorbereiten
+        currentCallType = 'group';
+        showGroupCallUI(groupName, members.length + 1, videoEnabled);
+        
+        // Gruppen-Peers zurücksetzen
+        groupPeers.clear();
+        groupStreams.clear();
+        
+        // Jedes Mitglied anrufen
+        let connectedCount = 0;
+        
+        members.forEach(member => {
+            console.log(`📞 Rufe ${member.user_id} an...`);
+            
+            try {
+                const call = peer.call(member.user_id, localStream, {
+                    metadata: {
+                        isGroup: true,
+                        groupId: groupId,
+                        groupName: groupName,
+                        hasVideo: videoEnabled
+                    }
+                });
+                
+                groupPeers.set(member.user_id, call);
+                
+                call.on('stream', (remoteStream) => {
+                    console.log('📹 Gruppen-Stream von:', member.user_id);
+                    groupStreams.set(member.user_id, remoteStream);
+                    updateGroupVideoGrid();
+                    
+                    connectedCount++;
+                    document.getElementById('callParticipants').textContent = 
+                        `${connectedCount + 1} Teilnehmer`;
+                });
+                
+                call.on('close', () => {
+                    console.log('👤 Teilnehmer verlassen:', member.user_id);
+                    groupPeers.delete(member.user_id);
+                    groupStreams.delete(member.user_id);
+                    updateGroupVideoGrid();
+                    
+                    connectedCount = groupPeers.size;
+                    document.getElementById('callParticipants').textContent = 
+                        `${connectedCount + 1} Teilnehmer`;
+                });
+                
+                call.on('error', (err) => {
+                    console.error(`Fehler bei ${member.user_id}:`, err);
+                    groupPeers.delete(member.user_id);
+                    
+                    connectedCount = groupPeers.size;
+                    document.getElementById('callParticipants').textContent = 
+                        `${connectedCount + 1} Teilnehmer`;
+                });
+                
+            } catch (callErr) {
+                console.error(`Fehler beim Anruf von ${member.user_id}:`, callErr);
+            }
+        });
+        
+        // Wenn niemand erreicht wurde
+        if (groupPeers.size === 0) {
+            alert('❌ Keine Teilnehmer konnten erreicht werden');
+            endCall();
+        }
+        
+    } catch (err) {
+        console.error('Fehler beim Gruppenanruf:', err);
+        
+        let message = '';
+        if (err.name === 'NotAllowedError') {
+            message = 'Bitte erlaube den Zugriff auf Kamera/Mikrofon!';
+        } else if (err.name === 'NotFoundError') {
+            message = 'Keine Kamera/Mikrofon gefunden!';
+        } else if (err.name === 'NotReadableError') {
+            message = 'Kamera/Mikrofon wird bereits verwendet!\n\n' +
+                     'Bitte schließe andere Programme (Zoom, Teams, andere Browser-Tabs)\n' +
+                     'und versuche es erneut.';
+        } else {
+            message = 'Fehler: ' + err.message;
+        }
+        
+        alert('❌ ' + message);
+        
+        // Cleanup bei Fehler
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+        }
+    }
+}
+
+    // Eingehenden Gruppenanruf behandeln
+    function handleIncomingGroupCall(call, metadata) {
+        pendingCall = {
+            call: call,
+            isGroup: true,
+            groupId: metadata.groupId,
+            groupName: metadata.groupName
+        };
+        
+        document.getElementById('incomingCaller').textContent = metadata.groupName;
+        document.getElementById('incomingCallText').textContent = 'möchte einen Gruppenanruf starten';
+        
+        // Teilnehmer anzeigen (optional)
+        document.getElementById('incomingCallParticipants').style.display = 'block';
+        document.getElementById('incomingCallParticipantsList').innerHTML = '<li>Lade Teilnehmer...</li>';
+        
+        document.getElementById('incomingCallDialog').classList.add('active');
+        document.getElementById('callOverlay').classList.add('active');
+    }
+
+// Verbesserte Gruppen-Call UI anzeigen
+function showGroupCallUI(groupName, participantCount, hasVideo) {
+    document.getElementById('callOverlay').classList.add('active');
+    document.getElementById('callContainer').classList.add('active');
+    document.getElementById('callContainer').classList.add('group-call');
+    document.getElementById('callHeader').textContent = `👥 Gruppenanruf: ${groupName}`;
+    document.getElementById('callParticipants').textContent = `${participantCount} Teilnehmer`;
+    
+    // Video-Container umschalten basierend auf Verfügbarkeit
+    if (hasVideo) {
+        document.getElementById('callVideoContainer').style.display = 'none';
+        document.getElementById('groupVideoGrid').style.display = 'grid';
+        document.getElementById('videoBtn').style.display = 'flex';
+    } else {
+        document.getElementById('callVideoContainer').style.display = 'none';
+        document.getElementById('groupVideoGrid').style.display = 'grid';
+        document.getElementById('videoBtn').style.display = 'none';
+        document.getElementById('videoBtn').classList.add('off');
+    }
+    
+    isMuted = false;
+    isVideoOff = !hasVideo;
+    document.getElementById('muteBtn').classList.remove('muted');
+    document.getElementById('muteBtn').innerHTML = '🎤';
+    
+    // Timer starten
+    callSeconds = 0;
+    if (callTimer) clearInterval(callTimer);
+    callTimer = setInterval(() => {
+        callSeconds++;
+        const minutes = Math.floor(callSeconds / 60);
+        const seconds = callSeconds % 60;
+        document.getElementById('callTimer').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+    
+    // Initiales Grid anzeigen
+    updateGroupVideoGrid();
+}
+
+// Verbesserte Gruppen-Video-Grid
+function updateGroupVideoGrid() {
+    const grid = document.getElementById('groupVideoGrid');
+    grid.innerHTML = '';
+    
+    // Prüfe ob es überhaupt Video-Streams gibt
+    const hasAnyVideo = localStream?.getVideoTracks().length > 0 || 
+                        Array.from(groupStreams.values()).some(s => s?.getVideoTracks().length > 0);
+    
+    // Dynamisches Grid basierend auf Teilnehmerzahl
+    const totalParticipants = 1 + groupStreams.size;
+    let columns = 2;
+    
+    if (totalParticipants > 4) columns = 3;
+    if (totalParticipants > 6) columns = 4;
+    if (totalParticipants > 9) columns = 5;
+    
+    grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+    
+    // Sortierte Liste aller Teilnehmer
+    const participants = [
+        { id: currentUser.username, stream: localStream, isSelf: true },
+        ...Array.from(groupStreams.entries())
+            .map(([id, stream]) => ({ id, stream, isSelf: false }))
+            .sort((a, b) => a.id.localeCompare(b.id))
+    ];
+    
+    participants.forEach(participant => {
+        const item = document.createElement('div');
+        item.className = 'video-item';
+        
+        if (participant.stream) {
+            const video = document.createElement('video');
+            video.srcObject = participant.stream;
+            video.autoplay = true;
+            video.playsInline = true;
+            if (participant.isSelf) {
+                video.muted = true;
+            }
+            
+            // Bei Problemen neu laden
+            video.onstalled = () => {
+                console.log('Video stalled, versuche neu zu laden...');
+                video.load();
+            };
+            
+            item.appendChild(video);
+        } else {
+            // Platzhalter wenn kein Stream
+            const placeholder = document.createElement('div');
+            placeholder.style.width = '100%';
+            placeholder.style.height = '100%';
+            placeholder.style.display = 'flex';
+            placeholder.style.alignItems = 'center';
+            placeholder.style.justifyContent = 'center';
+            placeholder.style.background = '#333';
+            placeholder.style.color = '#aaa';
+            placeholder.textContent = '⏳ Verbinde...';
+            item.appendChild(placeholder);
+        }
+        
+        const label = document.createElement('span');
+        label.className = 'video-label';
+        label.textContent = participant.isSelf ? `${participant.id} (Du)` : participant.id;
+        item.appendChild(label);
+        
+        grid.appendChild(item);
+    });
+    
+    // Höhe anpassen
+    if (totalParticipants <= 2) {
+        grid.style.height = '300px';
+    } else if (totalParticipants <= 4) {
+        grid.style.height = '400px';
+    } else {
+        grid.style.height = '500px';
+    }
+}
+
+    // Aktuellen Chat-Call starten (Freund oder Gruppe)
+    function startCurrentChatCall(type) {
+        if (selectedGroup) {
+            startGroupCall(selectedGroup.id, selectedGroup.name);
+        } else if (selectedFriend) {
+            if (type === 'video') {
+                startVideoCall();
+            } else {
+                startVoiceCall();
+            }
+        }
+    }
+
+    // Eingehenden Call annehmen
+    async function acceptIncomingCall(type) {
+        if (!pendingCall) return;
+        
+        if (pendingCall.isGroup) {
+            await acceptGroupCall(type);
+        } else {
+            await acceptOneToOneCall(type);
+        }
+    }
+
+    // 1:1 Call annehmen
+    async function acceptOneToOneCall(type) {
+        currentCallType = type;
+        
+        try {
+            // Vorherigen Stream stoppen
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            const constraints = {
+                audio: true,
+                video: type === 'video'
+            };
+            
+            console.log(`📹 Starte ${type} Stream...`);
+            localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            console.log('✅ Stream OK');
+            
+            if (type === 'video') {
+                const localVideo = document.getElementById('localVideo');
+                if (localVideo) {
+                    localVideo.srcObject = localStream;
+                    await localVideo.play().catch(e => console.log('Play error:', e));
+                }
+            } else {
+                document.getElementById('localVideo').srcObject = null;
+            }
+            
+            pendingCall.call.answer(localStream);
+            currentCall = pendingCall.call;
+            
+            currentCall.on('stream', (remoteStream) => {
+                console.log('📹 Remote Stream empfangen');
+                
+                if (type === 'video') {
+                    const remoteVideo = document.getElementById('remoteVideo');
+                    if (remoteVideo) {
+                        remoteVideo.srcObject = remoteStream;
+                        remoteVideo.play().catch(e => console.log('Play error:', e));
+                    }
+                } else {
+                    const audio = new Audio();
+                    audio.srcObject = remoteStream;
+                    audio.play().catch(e => console.log('Audio play error:', e));
+                }
+            });
+            
+            currentCall.on('close', () => {
+                console.log('Call beendet');
+                endCall();
+            });
+            
+            document.getElementById('incomingCallDialog').classList.remove('active');
+            showCallUI(pendingCall.call.peer, type);
+            
+            pendingCall = null;
+            
+        } catch (err) {
+            console.error('Fehler beim Annehmen:', err);
+            
+            let message = '';
+            if (err.name === 'NotAllowedError') {
+                message = 'Bitte erlaube den Zugriff auf Kamera/Mikrofon!';
+            } else if (err.name === 'NotFoundError') {
+                message = 'Keine Kamera/Mikrofon gefunden!';
+            } else if (err.name === 'NotReadableError') {
+                message = 'Kamera/Mikrofon wird bereits verwendet!\n\nBitte schließe andere Programme und versuche es erneut.';
+            } else {
+                message = 'Fehler: ' + err.message;
+            }
+            
+            alert('❌ ' + message);
+            
+            document.getElementById('incomingCallDialog').classList.remove('active');
+            document.getElementById('callOverlay').classList.remove('active');
+            pendingCall = null;
+        }
+    }
+
+    // Gruppen-Call annehmen
+    async function acceptGroupCall(type) {
+        try {
+            // Vorherigen Stream stoppen
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            const constraints = {
+                audio: true,
+                video: type === 'video'
+            };
+            
+            localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            
+            pendingCall.call.answer(localStream);
+            
+            // Gruppenanruf vorbereiten
+            currentCallType = 'group';
+            groupPeers.clear();
+            groupStreams.clear();
+            
+            // Den eingehenden Call speichern
+            const callerId = pendingCall.call.peer;
+            groupPeers.set(callerId, pendingCall.call);
+            
+            pendingCall.call.on('stream', (remoteStream) => {
+                groupStreams.set(callerId, remoteStream);
+                updateGroupVideoGrid();
+            });
+            
+            showGroupCallUI(pendingCall.groupName, 2); // Start mit 2 Teilnehmern
+            
+            document.getElementById('incomingCallDialog').classList.remove('active');
+            pendingCall = null;
+            
+        } catch (err) {
+            console.error('Fehler beim Annehmen des Gruppenanrufs:', err);
+            
+            if (err.name === 'NotAllowedError') {
+                alert('Bitte erlaube den Zugriff auf Kamera/Mikrofon!');
+            } else if (err.name === 'NotFoundError') {
+                alert('Keine Kamera/Mikrofon gefunden!');
+            } else {
+                alert('Fehler: ' + err.message);
+            }
+            
+            document.getElementById('incomingCallDialog').classList.remove('active');
+            document.getElementById('callOverlay').classList.remove('active');
+            pendingCall = null;
+        }
+    }
+
+    // Eingehenden Call ablehnen
+    function rejectIncomingCall() {
+        if (pendingCall) {
+            if (pendingCall.call) {
+                pendingCall.call.close();
+            }
+            pendingCall = null;
+        }
+        
+        document.getElementById('incomingCallDialog').classList.remove('active');
+        document.getElementById('callOverlay').classList.remove('active');
+    }
+
+    // Video-Call starten
+    async function startVideoCall() {
+        if (!selectedFriend) {
+            alert('Wähle zuerst einen Freund aus!');
+            return;
+        }
+        
+        if (!peerAvailable || !peer) {
+            alert('⚠️ PeerJS ist nicht verfügbar. Bitte Seite neu laden.');
+            return;
+        }
+        
+        currentCallType = 'video';
+        
+        try {
+            console.log('📹 Starte Video-Call...');
+            
+            // Vorherigen Stream stoppen
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            localStream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                },
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'user'
+                }
+            });
+            
+            console.log('✅ Kamera/Mikrofon OK');
+            
+            const localVideo = document.getElementById('localVideo');
+            if (localVideo) {
+                localVideo.srcObject = localStream;
+                await localVideo.play().catch(e => console.log('Local play error:', e));
+            }
+            
+            currentCall = peer.call(selectedFriend, localStream);
+            
+            currentCall.on('stream', (remoteStream) => {
+                console.log('📹 Remote Stream empfangen');
+                const remoteVideo = document.getElementById('remoteVideo');
+                if (remoteVideo) {
+                    remoteVideo.srcObject = remoteStream;
+                    remoteVideo.play().catch(e => console.log('Play error:', e));
+                }
+            });
+            
+            currentCall.on('close', () => {
+                console.log('Call beendet');
+                endCall();
+            });
+            
+            currentCall.on('error', (err) => {
+                console.error('Call Fehler:', err);
+                alert('Verbindungsfehler: ' + err.message);
+                endCall();
+            });
+            
+            showCallUI(selectedFriend, 'video');
+            document.getElementById('callInfo').innerHTML = '🔍 Ruf an...';
+            
+        } catch (err) {
+            console.error('❌ Medienfehler:', err);
+            
+            let message = '';
+            if (err.name === 'NotAllowedError') {
+                message = 'Bitte erlaube den Zugriff auf Kamera/Mikrofon!';
+            } else if (err.name === 'NotFoundError') {
+                message = 'Keine Kamera/Mikrofon gefunden!';
+            } else if (err.name === 'NotReadableError') {
+                message = 'Kamera/Mikrofon wird bereits verwendet!\n\nBitte schließe andere Programme und versuche es erneut.';
+            } else {
+                message = 'Fehler: ' + err.message;
+            }
+            
+            alert('❌ ' + message);
+        }
+    }
+
+    // Voice-Call starten
+    async function startVoiceCall() {
+        if (!selectedFriend) {
+            alert('Wähle zuerst einen Freund aus!');
+            return;
+        }
+        
+        if (!peerAvailable || !peer) {
+            alert('⚠️ PeerJS ist nicht verfügbar. Bitte Seite neu laden.');
+            return;
+        }
+        
+        currentCallType = 'voice';
+        
+        try {
+            console.log('🎤 Starte Voice-Call...');
+            
+            // Vorherigen Stream stoppen
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            localStream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                },
+                video: false
+            });
+            
+            console.log('✅ Mikrofon OK');
+            
+            currentCall = peer.call(selectedFriend, localStream);
+            
+            currentCall.on('stream', (remoteStream) => {
+                console.log('🎤 Remote Audio empfangen');
+                const audio = new Audio();
+                audio.srcObject = remoteStream;
+                audio.play().catch(e => console.log('Audio play error:', e));
+            });
+            
+            currentCall.on('close', () => {
+                console.log('Call beendet');
+                endCall();
+            });
+            
+            currentCall.on('error', (err) => {
+                console.error('Call Fehler:', err);
+                alert('Verbindungsfehler: ' + err.message);
+                endCall();
+            });
+            
+            showCallUI(selectedFriend, 'voice');
+            document.getElementById('callInfo').innerHTML = '🔍 Ruf an...';
+            
+        } catch (err) {
+            console.error('❌ Mikrofon-Fehler:', err);
+            
+            let message = '';
+            if (err.name === 'NotAllowedError') {
+                message = 'Bitte erlaube den Zugriff auf das Mikrofon!';
+            } else if (err.name === 'NotFoundError') {
+                message = 'Kein Mikrofon gefunden!';
+            } else if (err.name === 'NotReadableError') {
+                message = 'Mikrofon wird bereits verwendet!\n\nBitte schließe andere Programme und versuche es erneut.';
+            } else {
+                message = 'Fehler: ' + err.message;
+            }
+            
+            alert('❌ ' + message);
+        }
+    }
+
+    // Call UI anzeigen (1:1)
+    function showCallUI(partner, type) {
+        document.getElementById('callOverlay').classList.add('active');
+        document.getElementById('callContainer').classList.add('active');
+        document.getElementById('callContainer').classList.remove('group-call');
+        document.getElementById('callHeader').textContent = 
+            `${type === 'video' ? '📹' : '🎤'} Call mit ${partner}`;
+        document.getElementById('callParticipants').textContent = '';
+        
+        // Video-Container zurücksetzen
+        document.getElementById('callVideoContainer').style.display = 'block';
+        document.getElementById('groupVideoGrid').style.display = 'none';
+        
+        if (type === 'voice') {
+            document.getElementById('videoBtn').style.display = 'none';
+        } else {
+            document.getElementById('videoBtn').style.display = 'flex';
+        }
+        
+        isMuted = false;
+        isVideoOff = false;
+        document.getElementById('muteBtn').classList.remove('muted');
+        document.getElementById('muteBtn').innerHTML = '🎤';
+        document.getElementById('videoBtn').classList.remove('off');
+        document.getElementById('videoBtn').innerHTML = '📹';
+        
+        callSeconds = 0;
+        if (callTimer) clearInterval(callTimer);
+        callTimer = setInterval(() => {
+            callSeconds++;
+            const minutes = Math.floor(callSeconds / 60);
+            const seconds = callSeconds % 60;
+            document.getElementById('callTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    // VERBESSERTE Call beenden Funktion
+function endCall() {
+    console.log('📞 Beende Call...');
+    
+    // 1:1 Call beenden
+    if (currentCall) {
+        currentCall.close();
+        currentCall = null;
+    }
+    
+    // Gruppenanruf beenden
+    if (groupPeers.size > 0) {
+        groupPeers.forEach(call => {
+            try {
+                call.close();
+            } catch (e) {
+                console.log('Fehler beim Schließen:', e);
+            }
+        });
+        groupPeers.clear();
+        groupStreams.clear();
+    }
+    
+    // Stream komplett stoppen und freigeben
+    if (localStream) {
+        console.log('📹 Stoppe Kamera/Mikrofon...');
+        localStream.getTracks().forEach(track => {
+            track.stop();
+            console.log(`✅ Track gestoppt: ${track.kind}`);
+        });
+        localStream = null;
+    }
+    
+    // Video-Elemente leeren
+    document.getElementById('localVideo').srcObject = null;
+    document.getElementById('remoteVideo').srcObject = null;
+    
+    // UI ausblenden
+    document.getElementById('callContainer').classList.remove('active');
+    document.getElementById('callOverlay').classList.remove('active');
+    document.getElementById('incomingCallDialog').classList.remove('active');
+    
+    // Timer stoppen
+    if (callTimer) {
+        clearInterval(callTimer);
+        callTimer = null;
+    }
+    
+    pendingCall = null;
+    document.getElementById('videoBtn').style.display = 'flex';
+    document.getElementById('videoBtn').classList.remove('off');
+    
+    console.log('✅ Call beendet, Kamera freigegeben');
+}
+
+    // Stummschalten
+    function toggleMute() {
+        if (localStream) {
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (audioTrack) {
+                audioTrack.enabled = !audioTrack.enabled;
+                isMuted = !audioTrack.enabled;
+                const muteBtn = document.getElementById('muteBtn');
+                if (isMuted) {
+                    muteBtn.classList.add('muted');
+                    muteBtn.innerHTML = '🔇';
+                } else {
+                    muteBtn.classList.remove('muted');
+                    muteBtn.innerHTML = '🎤';
+                }
+            }
+        }
+    }
+
+    // Video umschalten
+    function toggleVideo() {
+        if (localStream && localStream.getVideoTracks().length > 0) {
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.enabled = !videoTrack.enabled;
+                isVideoOff = !videoTrack.enabled;
+                const videoBtn = document.getElementById('videoBtn');
+                if (isVideoOff) {
+                    videoBtn.classList.add('off');
+                    videoBtn.innerHTML = '🚫';
+                } else {
+                    videoBtn.classList.remove('off');
+                    videoBtn.innerHTML = '📹';
+                }
+            }
+        }
+    }
+
+    // Nachricht senden (entweder an Freund oder Gruppe)
+    function sendMessage() {
+        const input = document.getElementById('friendMessageInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        if (selectedGroup) {
+            // Gruppen-Nachricht
+            supabaseClient
+                .from('group_messages')
+                .insert([{
+                    group_id: selectedGroup.id,
+                    sender: currentUser.username,
+                    message: message
+                }])
+                .then(() => {
+                    console.log('Gruppen-Nachricht gesendet');
+                    displaySentMessage(message);
+                })
+                .catch(err => console.error('Fehler beim Senden:', err));
+        } else if (selectedFriend) {
+            // 1:1 Nachricht
+            supabaseClient
+                .from('friend_messages')
+                .insert([{
+                    sender: currentUser.username,
+                    receiver: selectedFriend,
+                    message: message,
+                    read: false
+                }])
+                .then(() => console.log('Nachricht gespeichert'))
+                .catch(err => console.error('Fehler beim Speichern:', err));
+            
+            displaySentMessage(message);
+        } else {
+            alert('Wähle zuerst einen Freund oder eine Gruppe aus!');
+            return;
+        }
+        
+        input.value = '';
+    }
+
+    // Nachricht gesendet anzeigen
+    function displaySentMessage(message) {
+        const container = document.getElementById('friendMessagesContent');
+        const time = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        
+        container.innerHTML += `
+            <div class="friend-message message-sent">
+                <div class="message-header">
+                    <span>${currentUser.username}</span>
+                    <span>${time}</span>
+                </div>
+                <div class="message-text">${escapeHtml(message)}</div>
+            </div>
+        `;
+        
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Freund für Chat auswählen
+    function selectChatFriend(friendUsername) {
+        selectedFriend = friendUsername;
+        selectedGroup = null;
+        
+        document.getElementById('currentChatFriend').textContent = friendUsername;
+        document.getElementById('chatMembers').textContent = '';
+        document.getElementById('callActions').style.display = 'flex';
+        
+        loadChatMessages(friendUsername);
+    }
+
+    // Gruppen-Chat öffnen
+    function openGroupChat(groupId, groupName) {
+        switchTab('chat');
+        setTimeout(() => {
+            selectGroupChat(groupId, groupName);
+        }, 300);
+    }
+
+    // Chat-Nachrichten laden
+    async function loadChatMessages(friendUsername) {
+        if (!currentUser || !supabaseClient) return;
+        
+        try {
+            const { data: messages, error } = await supabaseClient
+                .from('friend_messages')
+                .select('*')
+                .or(`and(sender.eq.${currentUser.username},receiver.eq.${friendUsername}),and(sender.eq.${friendUsername},receiver.eq.${currentUser.username})`)
+                .order('created_at');
+            
+            if (error) throw error;
+            
+            const container = document.getElementById('friendMessagesContent');
+            
+            if (!messages || messages.length === 0) {
+                container.innerHTML = '<div class="empty-chat">💬 Starte die Konversation!</div>';
+                return;
+            }
+            
+            let html = '';
+            messages.forEach(msg => {
+                const isSent = msg.sender === currentUser.username;
+                const time = new Date(msg.created_at).toLocaleTimeString('de-DE', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                html += `
+                    <div class="friend-message ${isSent ? 'message-sent' : 'message-received'}">
+                        <div class="message-header">
+                            <span>${msg.sender}</span>
+                            <span>${time}</span>
+                        </div>
+                        <div class="message-text">${escapeHtml(msg.message)}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Nachrichten:', error);
+        }
+    }
+
+    // Freunde laden
+    async function loadFriendsList() {
+        if (!currentUser || !supabaseClient) return;
+        
+        try {
+            const { data: friends, error } = await supabaseClient
+                .from('friends')
+                .select('*')
+                .or(`user1.eq.${currentUser.username},user2.eq.${currentUser.username}`)
+                .eq('status', 'accepted');
+            
+            if (error) throw error;
+            
+            const container = document.getElementById('friendsList');
+            
+            if (!friends || friends.length === 0) {
+                container.innerHTML = '<div class="empty-friends">👥 Keine Freunde</div>';
+                return;
+            }
+            
+            let html = '';
+            friends.forEach(friend => {
+                const friendUsername = friend.user1 === currentUser.username ? friend.user2 : friend.user1;
+                const initials = friendUsername.charAt(0).toUpperCase();
+                
+                html += `
+                    <div class="friend-item">
+                        <div class="friend-info">
+                            <div class="friend-avatar">${initials}</div>
+                            <div class="friend-details">
+                                <h4>${friendUsername}</h4>
+                                <p>Freund</p>
+                            </div>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="friend-action-btn chat-btn" onclick="startChat('${friendUsername}')">💬</button>
+                            <button class="friend-action-btn video-btn" onclick="startVideoCall()">📹</button>
+                            <button class="friend-action-btn voice-btn" onclick="startVoiceCall()">🎤</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Freunde:', error);
+        }
+    }
+
+    // Freundesanfragen laden
+    async function loadFriendRequests() {
+        if (!currentUser || !supabaseClient) return;
+        
+        try {
+            const { data: requests, error } = await supabaseClient
+                .from('friends')
+                .select('*')
+                .eq('user2', currentUser.username)
+                .eq('status', 'pending');
+            
+            if (error) throw error;
+            
+            const container = document.getElementById('friendRequests');
+            
+            if (!requests || requests.length === 0) {
+                container.innerHTML = '<div class="empty-friends">📭 Keine Anfragen</div>';
+                return;
+            }
+            
+            let html = '';
+            requests.forEach(request => {
+                const initials = request.user1.charAt(0).toUpperCase();
+                
+                html += `
+                    <div class="friend-item">
+                        <div class="friend-info">
+                            <div class="friend-avatar">${initials}</div>
+                            <div class="friend-details">
+                                <h4>${request.user1}</h4>
+                                <p>Möchte dich als Freund hinzufügen</p>
+                            </div>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="friend-action-btn accept-btn" onclick="acceptRequest('${request.user1}')">✅ Annehmen</button>
+                            <button class="friend-action-btn reject-btn" onclick="rejectRequest('${request.user1}')">❌ Ablehnen</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Anfragen:', error);
+        }
+    }
+
+    // Freunde für Chat laden
+    async function loadFriendsForChat() {
+        if (!currentUser || !supabaseClient) return;
+        
+        try {
+            const { data: friends, error } = await supabaseClient
+                .from('friends')
+                .select('*')
+                .or(`user1.eq.${currentUser.username},user2.eq.${currentUser.username}`)
+                .eq('status', 'accepted');
+            
+            if (error) throw error;
+            
+            const container = document.getElementById('friendChatList');
+            
+            if (!friends || friends.length === 0) {
+                container.innerHTML = '<div class="empty-friends">👥 Keine Freunde</div>';
+                return;
+            }
+            
+            let html = '';
+            friends.forEach(friend => {
+                const friendUsername = friend.user1 === currentUser.username ? friend.user2 : friend.user1;
+                const initials = friendUsername.charAt(0).toUpperCase();
+                
+                html += `
+                    <div class="friend-chat-item" onclick="selectChatFriend('${friendUsername}')">
+                        <div class="friend-avatar">${initials}</div>
+                        <div>
+                            <div style="font-weight: 600; color: white;">${friendUsername}</div>
+                            <div style="color: ${peerAvailable ? '#2ed573' : '#aaa'}; font-size: 12px;">
+                                ${peerAvailable ? '● Online' : '○ Offline'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Chat-Freunde:', error);
+        }
+    }
+
+    // Freundschaftsanfrage senden
+    async function sendFriendRequest() {
+        if (!currentUser || !supabaseClient) return;
+        
+        const friendUsername = document.getElementById('friendUsername').value.trim();
+        const resultElement = document.getElementById('addFriendResult');
+        
+        if (!friendUsername) {
+            resultElement.innerHTML = '<div class="message-result message-error">Bitte gib einen Benutzernamen ein</div>';
+            return;
+        }
+        
+        if (friendUsername === currentUser.username) {
+            resultElement.innerHTML = '<div class="message-result message-error">Du kannst nicht mit dir selbst befreundet sein</div>';
+            return;
+        }
+        
+        try {
+            const { data: userCheck } = await supabaseClient
+                .from('users')
+                .select('username')
+                .eq('username', friendUsername)
+                .single();
+            
+            if (!userCheck) {
+                resultElement.innerHTML = '<div class="message-result message-error">Benutzer nicht gefunden</div>';
+                return;
+            }
+            
+            const { error } = await supabaseClient
+                .from('friends')
+                .insert([{
+                    user1: currentUser.username,
+                    user2: friendUsername,
+                    status: 'pending'
+                }]);
+            
+            if (error) throw error;
+            
+            resultElement.innerHTML = '<div class="message-result message-success">Anfrage gesendet!</div>';
+            document.getElementById('friendUsername').value = '';
+            
+            setTimeout(() => resultElement.innerHTML = '', 3000);
+            
+        } catch (error) {
+            console.error('Fehler:', error);
+            resultElement.innerHTML = '<div class="message-result message-error">Fehler beim Senden</div>';
+        }
+    }
+
+    // Anfrage annehmen
+    async function acceptRequest(friendUsername) {
+        try {
+            await supabaseClient
+                .from('friends')
+                .update({ status: 'accepted' })
+                .eq('user1', friendUsername)
+                .eq('user2', currentUser.username);
+            
+            loadFriendRequests();
+            loadFriendsList();
+            loadFriendsForChat();
+            
+        } catch (error) {
+            console.error('Fehler:', error);
+        }
+    }
+
+    // Anfrage ablehnen
+    async function rejectRequest(friendUsername) {
+        try {
+            await supabaseClient
+                .from('friends')
+                .delete()
+                .eq('user1', friendUsername)
+                .eq('user2', currentUser.username);
+            
+            loadFriendRequests();
+            
+        } catch (error) {
+            console.error('Fehler:', error);
+        }
+    }
+
+    // Direkt zu Chat wechseln
+    function startChat(friendUsername) {
+        switchTab('chat');
+        setTimeout(() => {
+            const items = document.querySelectorAll('.friend-chat-item');
+            items.forEach(item => {
+                if (item.textContent.includes(friendUsername)) {
+                    item.click();
+                }
+            });
+        }, 300);
+    }
+
+    // Online-Status für alle Freunde aktualisieren
+    function updateOnlineStatusForAllFriends(online) {
+        const items = document.querySelectorAll('.friend-chat-item');
+        items.forEach(item => {
+            const statusDiv = item.querySelector('div > div:last-child');
+            if (statusDiv) {
+                statusDiv.style.color = online ? '#2ed573' : '#aaa';
+                statusDiv.innerHTML = online ? '● Online' : '○ Offline';
+            }
+        });
+    }
+
+    // Chat-Intervall
+    function startChatInterval() {
+        setInterval(() => {
+            if (selectedFriend && supabaseClient) {
+                loadChatMessages(selectedFriend);
+            }
+            if (selectedGroup && supabaseClient) {
+                loadGroupMessages(selectedGroup.id);
+            }
+        }, 5000);
+    }
+
+    // Tab wechseln
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        document.querySelectorAll('.friends-tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(tab + 'Tab').classList.add('active');
+    }
+
+    // Hilfe
+    function openHelp() {
+        document.getElementById('helpModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeHelp() {
+        document.getElementById('helpModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Warenkorb
+    function updateCartDisplay() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const cartCount = document.querySelector('.cart-count');
+        if (cartCount) cartCount.textContent = total;
+    }
+
+    function toggleCart() {
+        window.location.href = 'shop.html';
+    }
+
+    // Event Listener
+    function setupEventListeners() {
+        const input = document.getElementById('friendMessageInput');
+        if (input) {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+    }
+
+    // Escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Cleanup
+    window.addEventListener('beforeunload', () => {
+        if (currentCall) {
+            currentCall.close();
+        }
+        if (groupPeers.size > 0) {
+            groupPeers.forEach(call => call.close());
+        }
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+        }
+        if (peer) {
+            peer.destroy();
+        }
+    });
+    </script>
+</body>
+</html>

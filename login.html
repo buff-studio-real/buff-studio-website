@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Buff Studio</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== LOGIN SEITE ===== */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            padding: 20px;
+            margin-top: 100px;
+        }
+
+        .login-box {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+        }
+
+        .login-header h1 {
+            color: white;
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .login-header p {
+            color: #aaa;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .remember-me, .terms-agree {
+            display: flex;
+            align-items: center;
+            color: #aaa;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .remember-me input, .terms-agree input {
+            display: none;
+        }
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-right: 8px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .remember-me input:checked + .checkmark,
+        .terms-agree input:checked + .checkmark {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .remember-me input:checked + .checkmark:after,
+        .terms-agree input:checked + .checkmark:after {
+            content: "✓";
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .support-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .support-link:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            text-decoration: none;
+        }
+
+        .login-btn, .register-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .login-btn:hover, .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:disabled, .register-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-text, .btn-loading {
+            display: inline-block;
+        }
+
+        .register-link, .login-link {
+            text-align: center;
+            color: #aaa;
+        }
+
+        .register-link a, .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-link a:hover, .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .terms-agree a {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .terms-agree a:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #99ff99;
+        }
+
+        .message.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff9999;
+        }
+
+        .message.loading {
+            background: rgba(255, 165, 2, 0.1);
+            color: #ffa502;
+            border: 1px solid rgba(255, 165, 2, 0.3);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* AGB Modal */
+        .agb-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+        }
+
+        .agb-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30,30,30,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .close-agb {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .agb-modal-content h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .agb-content {
+            color: whitesmoke;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .agb-content h4 {
+            color: #667eea;
+            margin: 20px 0 10px 0;
+            font-size: 18px;
+        }
+
+        .agb-content p {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .agb-content ul {
+            margin: 10px 0 20px 20px;
+        }
+
+        .agb-content li {
+            margin-bottom: 8px;
+        }
+
+        .agb-accept-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .agb-accept-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Hilfe Modal */
+        .help-button-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .help-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .help-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .help-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30,30,30,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .close-help {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .help-modal-content h3 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .contact-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .help-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .help-links a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 5px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .help-links a:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+        }
+
+        /* Passwort vergessen Bereich */
+        .password-help {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .password-help h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .password-help p {
+            color: #aaa;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-container {
+                margin-top: 120px;
+                padding: 15px;
+            }
+            
+            .login-box {
+                padding: 30px 25px;
+            }
+            
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .agb-modal-content {
+                padding: 25px;
+                max-height: 85vh;
+            }
+
+            .help-modal-content {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 25px 20px;
+            }
+            
+            .login-header h1 {
+                font-size: 24px;
+            }
+            
+            .login-header p {
+                font-size: 14px;
+            }
+
+            .agb-modal-content {
+                padding: 20px;
+                max-height: 90vh;
+            }
+
+            .help-modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- NAVBAR -->
+    <nav>
+        <ul>
+            <li><a href='index.html'>Startseite</a></li>
+            <li><a href='aboutus.html'>Über uns</a></li>
+            <li><a href='team.html'>Unser Team</a></li>
+            <li><a href='games.html'>Spiele</a></li>
+            <li><a href='shop.html'>Shop</a></li>
+            <!-- Admin Link - wird nur für Admins angezeigt -->
+            <li id="adminNavItem" style="display: none;">
+                <a href='shopadmin.html' style='color: #FFD700;'>Admin</a>
+            </li>
+            <!-- Live Event Button - wird nur bei aktiven Events angezeigt -->
+            <li id="liveEventNavItem" style="display: none;">
+                <a href="javascript:void(0)" style="color: #ff4757; font-weight: bold; animation: pulse 2s infinite;">
+                    🔴 LIVE Event
+                </a>
+            </li>
+            <li class="login-nav-item">
+                <!-- Wird durch JavaScript gefüllt -->
+            </li>
+            <li class="balance-nav-item" style="display: none;">
+                <a href="javascript:void(0)" style="color: #FFD700; font-weight: bold;">
+                    💰 <span id="navBalance">0,00</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <script src="common.js"></script>
+    <style>
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+    </style>
+    
+    <a href="index.html"><img src="img/logo.png" class="scroll-follow-image" alt="Buff Studios Logo"></a>
+    
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <img src="img/logo.png" alt="Buff Studio Logo" class="login-logo">
+                <h1>Willkommen zurück</h1>
+                <p>Melde dich mit deinem Konto an</p>
+            </div>
+            
+            <form class="login-form" id="loginForm" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Benutzername</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Passwort</label>
+                    <input type="password" id="password" name="password" required>
+                    <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                </div>
+                
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkmark"></span>
+                        Angemeldet bleiben
+                    </label>
+                    <a href="#" class="support-link" onclick="openHelp()">Support kontaktieren</a>
+                </div>
+                
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="btn-text">Login ➜</span>
+                    <span class="btn-loading" style="display: none;">Wird geladen...</span>
+                </button>
+                
+                <div class="register-link">
+                    <p>Noch kein Konto? <a href="#" id="showRegister">Jetzt registrieren</a></p>
+                </div>
+
+                <!-- Passwort vergessen Hilfe Bereich -->
+                <div class="password-help">
+                    <h4>🔒 Passwort vergessen?</h4>
+                    <p>Kontaktiere unseren Support:</p>
+                    <p><strong>📧 supbuffstudios@outlook.com</strong></p>
+                    <p>Wir helfen dir gerne weiter!</p>
+                </div>
+            </form>
+            
+            <form class="register-form" id="registerForm" style="display: none;" onsubmit="return handleRegister(event)">
+                <div class="form-group">
+                    <label for="regUsername">Benutzername</label>
+                    <input type="text" id="regUsername" name="regUsername" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" name="regEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword">Passwort</label>
+                    <input type="password" id="regPassword" name="regPassword" required>
+                    <button type="button" class="toggle-password" id="toggleRegPassword">👁️</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPassword">Passwort bestätigen</label>
+                    <input type="password" id="regConfirmPassword" name="regConfirmPassword" required>
+                    <button type="button" class="toggle-password" id="toggleRegConfirmPassword">👁️</button>
+                </div>
+                
+                <div class="form-options">
+                    <label class="terms-agree">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <span class="checkmark"></span>
+                        Ich akzeptiere die <a href="#" id="showAgb">AGB's</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="register-btn" id="registerBtn">
+                    <span class="btn-text">Konto erstellen</span>
+                    <span class="btn-loading" style="display: none;">Wird erstellt...</span>
+                </button>
+                
+                <div class="login-link">
+                    <p>Bereits ein Konto? <a href="#" id="showLogin">Zurück zum Login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AGB Modal -->
+    <div class="agb-modal" id="agbModal">
+        <div class="agb-modal-content">
+            <button class="close-agb" id="closeAgb">&times;</button>
+            <h3>Allgemeine Geschäftsbedingungen (AGB)</h3>
+            <div class="agb-content">
+                <p><strong>Um ein Account erstellen zu können, müssen Sie diese AGB's durchlesen und akzeptieren.</strong></p>
+                <h4>Account Nutzung</h4>
+                <p>Accounts sind <strong>NICHT</strong> zum Kauf oder Verkauf gedacht. Sie sind für den persönlichen Gebrauch bestimmt und dürfen nicht verkauft oder gekauft werden.</p>
+                <h4>E-Mail Benachrichtigungen</h4>
+                <p>Um einen Buff-Account erstellen zu können, müssen Sie Ihre E-Mail angeben und sich damit einverstanden erklären, dass wir Ihnen Benachrichtigungen per E-Mail senden.</p>
+                <h4>Konsequenzen bei Verstößen</h4>
+                <p>Wer gegen die AGB's verstößt, wird eine temporäre oder dauerhafte Sperrung erhalten oder sogar rechtlich verfolgt.</p>
+                <h4>Wichtige Hinweise</h4>
+                <ul>
+                    <li>Accounts sind persönlich und nicht übertragbar</li>
+                    <li>Die Weitergabe von Account-Daten ist untersagt</li>
+                    <li>Missbrauch führt zu sofortiger Account-Sperrung</li>
+                    <li>Wir behalten uns rechtliche Schritte bei Verstößen vor</li>
+                </ul>
+                <p><strong>Durch das Akzeptieren der AGB's erklären Sie sich mit diesen Bedingungen einverstanden.</strong></p>
+            </div>
+            <button class="agb-accept-btn" id="acceptAgb">AGB's Akzeptieren</button>
+        </div>
+    </div>
+
+    <!-- Hilfe Button -->
+    <div class="help-button-container">
+        <button class="help-button" id="helpButton">Du brauchst Hilfe?</button>
+    </div>
+
+    <!-- Hilfe Modal -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-content">
+            <button class="close-help" id="closeHelp">&times;</button>
+            <h3>Hilfe & Support</h3>
+            <p>Bei Problemen mit deinem Account oder Passwort:</p>
+            <div class="contact-info">
+                <p><strong>📧 Email:</strong> supbuffstudios@outlook.com</p>
+                <p><strong>⏰ Support:</strong> 24/7 erreichbar</p>
+                <p><strong>🔒 Passwort zurücksetzen:</strong> Wir helfen dir per Email</p>
+            </div>
+            <p>Schicke uns einfach eine Email mit deinem Benutzernamen und wir setzen dein Passwort zurück!</p>
+            <div class="help-links">
+                <a href='team.html'>Unser Team</a>
+                <a href='aboutus.html'>Über Uns</a>
+                <a href='games.html'>Unsere Spiele</a>
+                <a href='shop.html'>Shop</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // UI Funktionen
+        function setupEventListeners() {
+            // Password Toggles
+            document.getElementById('togglePassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+
+            document.getElementById('toggleRegPassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('regPassword');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+
+            document.getElementById('toggleRegConfirmPassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('regConfirmPassword');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+
+            // Form Switchers
+            document.getElementById('showRegister').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+            });
+
+            document.getElementById('showLogin').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
+            });
+
+            // AGB Modal
+            document.getElementById('showAgb').addEventListener('click', function(e) {
+                e.preventDefault();
+                openAgb();
+            });
+
+            document.getElementById('closeAgb').addEventListener('click', closeAgb);
+            document.getElementById('acceptAgb').addEventListener('click', acceptAgb);
+
+            // Hilfe Modal
+            document.getElementById('helpButton').addEventListener('click', openHelp);
+            document.getElementById('closeHelp').addEventListener('click', closeHelp);
+
+            // Modal schließen bei Klick außerhalb
+            document.addEventListener('click', function(e) {
+                if (e.target === document.getElementById('helpModal')) {
+                    closeHelp();
+                }
+                if (e.target === document.getElementById('agbModal')) {
+                    closeAgb();
+                }
+            });
+
+            // Escape Taste
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeHelp();
+                    closeAgb();
+                }
+            });
+        }
+
+        // AGB Modal Funktionen
+        function openAgb() {
+            document.getElementById('agbModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAgb() {
+            document.getElementById('agbModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function acceptAgb() {
+            document.getElementById('agreeTerms').checked = true;
+            closeAgb();
+            showMessage('AGB erfolgreich akzeptiert!', 'success');
+        }
+
+        // Hilfe Modal Funktionen
+        function openHelp() {
+            document.getElementById('helpModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Login Handler mit CommonJS
+        async function handleLogin(event) {
+            event.preventDefault(); // WICHTIG: Verhindert GET-Parameter in URL
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const btn = document.getElementById('loginBtn');
+
+            if (!username || !password) {
+                showMessage('Bitte fülle alle Felder aus!', 'error');
+                return false;
+            }
+
+            setLoading(btn, true);
+
+            try {
+                // Prüfen ob CommonJS verfügbar ist
+                if (!window.CommonJS || !window.CommonJS.loginUser) {
+                    throw new Error('Login-System nicht verfügbar');
+                }
+                
+                // Login mit CommonJS durchführen
+                const result = await window.CommonJS.loginUser(username, password, rememberMe);
+                
+                if (result.success) {
+                    showMessage('Erfolgreich angemeldet!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                    
+                } else {
+                    showMessage(result.error || 'Login fehlgeschlagen', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Login Fehler:', error);
+                showMessage(error.message || 'Ein Fehler ist aufgetreten', 'error');
+            } finally {
+                setLoading(btn, false);
+            }
+            
+            return false; // Verhindert Formular-Submit
+        }
+
+        // Register Handler mit CommonJS
+        async function handleRegister(event) {
+            event.preventDefault(); // WICHTIG: Verhindert GET-Parameter in URL
+            
+            const username = document.getElementById('regUsername').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            const btn = document.getElementById('registerBtn');
+
+            // Validierung
+            if (!username || !email || !password || !confirmPassword) {
+                showMessage('Bitte fülle alle Felder aus!', 'error');
+                return false;
+            }
+
+            if (username.length < 3) {
+                showMessage('Benutzername muss mindestens 3 Zeichen lang sein!', 'error');
+                return false;
+            }
+
+            if (password.length < 4) {
+                showMessage('Passwort muss mindestens 4 Zeichen lang sein!', 'error');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwörter stimmen nicht überein!', 'error');
+                return false;
+            }
+
+            if (!agreeTerms) {
+                showMessage('Bitte akzeptiere die AGBs!', 'error');
+                return false;
+            }
+
+            setLoading(btn, true);
+
+            try {
+                // Prüfen ob CommonJS verfügbar ist
+                if (!window.CommonJS || !window.CommonJS.registerUser) {
+                    throw new Error('Registrierungs-System nicht verfügbar');
+                }
+                
+                // Registrierung mit CommonJS durchführen
+                const result = await window.CommonJS.registerUser(username, email, password);
+                
+                if (result.success) {
+                    if (result.needsLogin) {
+                        showMessage('Registrierung erfolgreich! Bitte logge dich jetzt ein.', 'success');
+                        // Zum Login-Tab wechseln und Felder vorausfüllen
+                        document.getElementById('registerForm').style.display = 'none';
+                        document.getElementById('loginForm').style.display = 'block';
+                        document.getElementById('username').value = username;
+                        document.getElementById('password').value = password;
+                    } else {
+                        showMessage('Registrierung erfolgreich! Du wirst eingeloggt...', 'success');
+                        // Automatisch einloggen und weiterleiten
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 2000);
+                    }
+                } else {
+                    showMessage(result.error || 'Registrierung fehlgeschlagen', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Registrierungs Fehler:', error);
+                showMessage(error.message || 'Ein Fehler ist aufgetreten', 'error');
+            } finally {
+                setLoading(btn, false);
+            }
+            
+            return false; // Verhindert Formular-Submit
+        }
+
+        // Loading State
+        function setLoading(button, isLoading) {
+            const text = button.querySelector('.btn-text');
+            const loading = button.querySelector('.btn-loading');
+            
+            if (isLoading) {
+                text.style.display = 'none';
+                loading.style.display = 'inline';
+                button.disabled = true;
+            } else {
+                text.style.display = 'inline';
+                loading.style.display = 'none';
+                button.disabled = false;
+            }
+        }
+
+        // Nachrichten anzeigen
+        function showMessage(message, type) {
+            // Alte Nachrichten entfernen
+            const oldMessages = document.querySelectorAll('.message');
+            oldMessages.forEach(msg => msg.remove());
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            
+            // Nachricht nach dem Header einfügen
+            const loginHeader = document.querySelector('.login-header');
+            if (loginHeader && loginHeader.parentNode) {
+                loginHeader.parentNode.insertBefore(messageDiv, loginHeader.nextSibling);
+            }
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            
+            // Auto-Focus auf Username Input
+            document.getElementById('username').focus();
+            
+            // Wenn Login-Daten in URL sind (für direkten Login - nur als Fallback)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlUsername = urlParams.get('username');
+            const urlPassword = urlParams.get('password');
+            
+            if (urlUsername && urlPassword) {
+                // In Login-Felder vorausfüllen
+                document.getElementById('username').value = urlUsername;
+                document.getElementById('password').value = urlPassword;
+                
+                // Automatisch einloggen nach kurzer Verzögerung
+                setTimeout(() => {
+                    handleLogin(new Event('submit'));
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1833 @@
+.buffstudio-logotext {
+    text-align: center;
+    color: white;
+    font-size: 100px;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 2000;
+    font-style: normal;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    color: white;
+    background-color: #121212;
+    margin: 0;
+    padding: 0;
+}
+
+.buffstudio-centergreytext {
+    text-align: center;
+    color: grey;
+    font-size: 20px;
+}
+
+p {
+    color: whitesmoke;
+    text-align: center;
+}
+
+/* CSS für das scrollverfolgende Bild - FIXIERT über allem */
+.scroll-follow-image {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    border-radius: 8px;
+    background: white;
+    pointer-events: auto;
+    transition: all 0.3s ease;
+}
+
+.scroll-follow-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+}
+
+/* Sicherstellen dass andere Elemente darunter liegen */
+nav {
+    z-index: 1000;
+}
+
+.news-detail-view {
+    z-index: 2000;
+}
+
+/* Für größere Bildschirme */
+@media (min-width: 768px) {
+    .scroll-follow-image {
+        width: 70px;
+        height: 70px;
+        top: 25px;
+        left: 25px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .scroll-follow-image {
+        width: 80px;
+        height: 80px;
+        top: 30px;
+        left: 30px;
+    }
+}
+
+/* Für sehr kleine Bildschirme */
+@media (max-width: 480px) {
+    .scroll-follow-image {
+        top: 15px;
+        left: 15px;
+        width: 50px;
+        height: 50px;
+    }
+}
+
+nav {
+    height: 90px;
+    width: 100%;
+    background-color: black;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative;
+    z-index: 1001;
+}
+
+nav ul {
+    display: flex;
+    margin-right: 20px;
+}
+
+nav li {
+    display: inline-block;
+    margin-right: 40px;
+    position: relative;
+}
+
+nav li a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    font-family: "Inter", sans-serif;
+    padding: 10px 15px;
+    border: 2px solid transparent;
+    position: relative;
+    display: block;
+    transition: border-color 0.2s ease;
+}
+
+nav li a:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+nav li a.active {
+    border-color: white;
+}
+
+.auth-container {
+    width: 500px;
+    position: fixed;
+    right: 50px;
+    top: 120px;
+    padding: 20px;
+}
+
+.auth-box {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.auth-box h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 32px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 18px;
+    transition: border-color 0.3s ease;
+    margin-bottom: 5px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: white;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.auth-button {
+    width: 100%;
+    padding: 15px;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.auth-button:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.switch-form {
+    text-align: center;
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.switch-form a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.switch-form a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.alert-error {
+    background-color: rgba(255, 0, 0, 0.2);
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    color: #ff9999;
+}
+
+.alert-success {
+    background-color: rgba(0, 255, 0, 0.2);
+    border: 2px solid rgba(0, 255, 0, 0.3);
+    color: #99ff99;
+}
+
+/* Team page styles - Kleinere Boxen */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.team-card {
+    background-color: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    padding: 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border: 2px solid transparent;
+    transition: border-color 200ms ease, transform 160ms ease, box-shadow 160ms ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 280px;
+}
+
+.team-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.5);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.team-card.open {
+    border-color: white;
+    height: auto;
+    min-height: 280px;
+}
+
+/* Kleinere Profilbilder */
+.card-photo {
+    width: 100%;
+    height: 140px;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    position: relative;
+}
+
+.card-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.team-card:hover .card-photo img {
+    transform: scale(1.05);
+}
+
+/* Kleinere Info-Bereich */
+.card-info {
+    background-color: black;
+    padding: 15px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 0 0 10px 10px;
+}
+
+.card-name {
+    color: white;
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.card-role {
+    color: #aaa;
+    margin: 0;
+    font-size: 13px;
+}
+
+.card-details {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 400ms ease, opacity 300ms ease;
+    color: whitesmoke;
+    background-color: rgba(0,0,0,0.8);
+    padding: 0 15px;
+    font-size: 14px;
+}
+
+.team-card.open .card-details {
+    max-height: 150px;
+    opacity: 1;
+    padding: 12px 15px;
+}
+
+/* Responsive Anpassungen für kleinere Team-Boxen */
+@media (max-width: 768px) {
+    .team-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+    
+    .team-card {
+        height: 260px;
+    }
+    
+    .team-card.open {
+        min-height: 260px;
+    }
+    
+    .card-photo {
+        height: 130px;
+    }
+    
+    .card-info {
+        height: 70px;
+        padding: 12px;
+    }
+    
+    .card-name {
+        font-size: 17px;
+    }
+    
+    .card-role {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin: 15px auto;
+        padding: 0 10px;
+        max-width: 300px;
+    }
+    
+    .team-card {
+        height: 240px;
+    }
+    
+    .team-card.open {
+        min-height: 240px;
+    }
+    
+    .card-photo {
+        height: 120px;
+    }
+    
+    .card-info {
+        height: 60px;
+        padding: 10px;
+    }
+    
+    .card-name {
+        font-size: 16px;
+    }
+    
+    .card-role {
+        font-size: 11px;
+    }
+    
+    .card-details {
+        font-size: 13px;
+        padding: 0 10px;
+    }
+    
+    .team-card.open .card-details {
+        padding: 10px;
+        max-height: 120px;
+    }
+}
+
+/* Sehr kleine Bildschirme */
+@media (max-width: 320px) {
+    .team-grid {
+        max-width: 280px;
+    }
+    
+    .team-card {
+        height: 220px;
+    }
+    
+    .team-card.open {
+        min-height: 220px;
+    }
+    
+    .card-photo {
+        height: 110px;
+    }
+    
+    .card-info {
+        height: 55px;
+    }
+}
+
+/* Language selector */
+.lang-select {
+    margin-left: 12px;
+}
+
+.lang-select select {
+    background: black;
+    color: white;
+    border: 2px solid transparent;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-family: "Inter", sans-serif;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 24px;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 8px auto;
+}
+
+.lang-select select:hover {
+    border-color: rgba(255,255,255,0.4);
+}
+
+.lang-select select:focus {
+    outline: none;
+    border-color: white;
+}
+
+/* Games page specific styles */
+.games-container {
+    max-width: calc(100% - 100px);
+    margin: 30px 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.game-card {
+    background-color: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    border: 2px solid transparent;
+    transition: border-color 200ms ease, transform 160ms ease, box-shadow 160ms ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.game-card.open {
+    border-color: white;
+}
+
+.game-art {
+    width: 100%;
+    height: 200px;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    position: relative;
+}
+
+.game-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Schwarzer Bereich unter dem Thumbnail */
+.game-info {
+    background-color: black;
+    padding: 20px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 0 0 12px 12px;
+}
+
+.game-card h3 {
+    color: white;
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.game-card p {
+    color: whitesmoke;
+    text-align: left;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Responsive adjustments for games page */
+@media (max-width: 768px) {
+    .games-container {
+        max-width: calc(100% - 40px);
+        margin: 20px;
+        grid-template-columns: 1fr;
+    }
+    
+    .game-art {
+        height: 180px;
+    }
+    
+    .game-info {
+        height: 70px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .games-container {
+        max-width: calc(100% - 20px);
+        margin: 10px;
+    }
+    
+    .game-art {
+        height: 160px;
+    }
+    
+    .game-info {
+        height: 60px;
+        padding: 12px;
+    }
+    
+    .game-card h3 {
+        font-size: 18px;
+    }
+    
+    .game-card p {
+        font-size: 13px;
+    }
+}
+
+/* News section styles - Kleine Boxen */
+.news-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.news-card {
+    background-color: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+    cursor: pointer;
+    position: relative;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.news-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.news-date {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 400;
+}
+
+.news-author {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 12px;
+    font-style: italic;
+}
+
+.news-title {
+    color: white;
+    font-size: 22px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.news-content {
+    color: whitesmoke;
+    line-height: 1.6;
+    margin: 0;
+    text-align: left;
+}
+
+.news-preview {
+    display: block;
+}
+
+.news-full {
+    display: none;
+}
+
+.project-highlight {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border-left: 4px solid white;
+}
+
+/* News Detail View - Große Box mit korrigiertem Rand */
+.news-detail-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(18, 18, 18, 0.98);
+    z-index: 2000;
+    padding: 20px;
+    overflow-y: auto;
+    display: none;
+    backdrop-filter: blur(5px);
+    box-sizing: border-box;
+}
+
+.news-detail-content {
+    width: calc(100% - 40px);
+    max-width: 1200px;
+    min-height: 80vh;
+    margin: 0 auto;
+    background-color: rgba(30, 30, 30, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    border: 2px solid rgba(255,255,255,0.2);
+    position: relative;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.close-news-detail {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.3);
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 2001;
+}
+
+.close-news-detail:hover {
+    background-color: rgba(255,255,255,0.25);
+    transform: scale(1.1);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.news-detail-title {
+    color: white;
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 25px;
+    font-weight: 700;
+    padding-right: 70px;
+    line-height: 1.3;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.news-detail-meta {
+    color: #aaa;
+    font-size: clamp(16px, 2vw, 18px);
+    margin-bottom: 35px;
+    border-bottom: 2px solid rgba(255,255,255,0.15);
+    padding-bottom: 25px;
+    text-align: center;
+}
+
+.news-detail-content-text {
+    color: whitesmoke;
+    line-height: 1.8;
+    font-size: clamp(16px, 2vw, 18px);
+    text-align: left;
+    overflow-y: auto;
+    flex: 1;
+    padding: 0 15px 10px 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.news-detail-content-text p {
+    text-align: left;
+    margin-bottom: 25px;
+    font-size: clamp(16px, 2vw, 18px);
+    width: 100%;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+/* Scrollbar für den Content */
+.news-detail-content-text::-webkit-scrollbar {
+    width: 8px;
+}
+
+.news-detail-content-text::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+}
+
+.news-detail-content-text::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+}
+
+.news-detail-content-text::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.4);
+}
+
+/* Responsive adjustments für große Box */
+@media (max-width: 1024px) {
+    .news-detail-content {
+        width: calc(100% - 30px);
+        padding: 35px;
+        min-height: 85vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .news-detail-view {
+        padding: 15px;
+    }
+    
+    .news-detail-content {
+        width: calc(100% - 20px);
+        padding: 30px 25px;
+        min-height: 88vh;
+        border-radius: 16px;
+    }
+    
+    .close-news-detail {
+        top: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+    }
+    
+    .news-detail-title {
+        padding-right: 60px;
+        margin-bottom: 20px;
+    }
+    
+    .news-detail-meta {
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+    }
+    
+    .news-detail-content-text {
+        padding-right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .news-detail-view {
+        padding: 10px;
+    }
+    
+    .news-detail-content {
+        width: calc(100% - 10px);
+        padding: 25px 20px;
+        min-height: 90vh;
+        border-radius: 14px;
+        border-width: 1px;
+    }
+    
+    .close-news-detail {
+        top: 12px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .news-detail-title {
+        padding-right: 50px;
+        font-size: 24px;
+    }
+    
+    .news-detail-meta {
+        font-size: 15px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    
+    .news-detail-content-text {
+        padding-right: 5px;
+    }
+    
+    .news-detail-content-text p {
+        margin-bottom: 20px;
+    }
+}
+
+/* Sehr kleine Bildschirme */
+@media (max-width: 320px) {
+    .news-detail-content {
+        width: calc(100% - 5px);
+        padding: 20px 15px;
+        border-radius: 12px;
+    }
+    
+    .news-detail-title {
+        font-size: 22px;
+        padding-right: 45px;
+    }
+    
+    .close-news-detail {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+    
+    .news-detail-content-text {
+        padding-right: 2px;
+    }
+}
+
+/* Anpassung für sehr hohe/tiefe Bildschirme */
+@media (max-height: 700px) {
+    .news-detail-content {
+        min-height: 85vh;
+        max-height: 90vh;
+    }
+    
+    .news-detail-title {
+        font-size: clamp(24px, 5vh, 32px);
+    }
+    
+    .news-detail-content-text {
+        font-size: clamp(15px, 3vh, 17px);
+    }
+}
+
+@media (max-height: 500px) {
+    .news-detail-content {
+        min-height: 90vh;
+        max-height: 95vh;
+    }
+}
+
+/* Hilfe Button Styles */
+.help-button-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.help-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.help-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+.help-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.help-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30,30,30,0.95);
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid rgba(255,255,255,0.2);
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.close-help {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.help-modal-content h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.help-modal-content p {
+    color: whitesmoke;
+    margin-bottom: 15px;
+}
+
+.contact-info {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.contact-info p {
+    margin: 8px 0;
+}
+
+.help-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.help-links a {
+    color: #667eea;
+    text-decoration: none;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.help-links a:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* ===== LOGIN-REITER - NUR EMOJI ===== */
+.login-nav-item {
+    margin-left: auto;
+    margin-right: 0 !important;
+}
+
+.login-nav-link {
+    padding: 10px 15px !important;
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid transparent !important;
+}
+
+.login-nav-link:hover {
+    background: rgba(102, 126, 234, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Responsive für Login-Reiter */
+@media (max-width: 768px) {
+    .login-nav-item {
+        margin-left: 0;
+        width: 100%;
+        order: -1;
+    }
+    
+    .login-nav-link {
+        width: 100% !important;
+        justify-content: center !important;
+        border-left: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Hilfe Button Styles */
+.help-button-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.help-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.help-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+.help-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.help-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30,30,30,0.95);
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid rgba(255,255,255,0.2);
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.close-help {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.help-modal-content h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.help-modal-content p {
+    color: whitesmoke;
+    margin-bottom: 15px;
+}
+
+.contact-info {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.contact-info p {
+    margin: 8px 0;
+}
+
+.help-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.help-links a {
+    color: #667eea;
+    text-decoration: none;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.help-links a:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* ===== USERNAME ANZEIGE ===== */
+.user-nav-item {
+    margin-left: auto;
+    margin-right: 0 !important;
+}
+
+.user-nav-link {
+    padding: 10px 15px !important;
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid transparent !important;
+    color: #667eea !important;
+    font-weight: 600;
+}
+
+.user-nav-link:hover {
+    background: rgba(102, 126, 234, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: white;
+    margin-right: 8px;
+}
+
+/* Responsive für Username-Anzeige */
+@media (max-width: 768px) {
+    .user-nav-item {
+        margin-left: 0;
+        width: 100%;
+        order: -1;
+    }
+    
+    .user-nav-link {
+        width: 100% !important;
+        justify-content: center !important;
+        border-left: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* ===== SHOP SEITE ===== */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 100px auto 50px;
+    padding: 20px;
+}
+
+.shop-item {
+    background-color: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 0;
+    border: 2px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.coin-item {
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.coin-item:hover {
+    border-color: rgba(255, 215, 0, 0.6);
+}
+
+.shop-item:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255,255,255,0.3);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.shop-item:hover .product-image img {
+    transform: scale(1.05);
+}
+
+.product-info {
+    padding: 20px;
+    background-color: black;
+}
+
+.product-info h3 {
+    color: white;
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.product-description {
+    color: #aaa;
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    line-height: 1.4;
+    min-height: 40px;
+}
+
+.coin-price-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 15px 0;
+}
+
+.coin-amount {
+    color: #FFD700;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.product-price {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 15px 0;
+}
+
+.order-info-box {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.order-info-box h3 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.order-info-box p {
+    color: #ddd;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.email-address {
+    background: rgba(102, 126, 234, 0.2);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 18px;
+    color: #667eea;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.order-info-box ul {
+    text-align: left;
+    color: #ddd;
+    margin: 20px auto;
+    max-width: 400px;
+}
+
+.order-info-box li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.order-note {
+    font-style: italic;
+    color: #FFD700;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+/* Responsive Shop */
+@media (max-width: 768px) {
+    .shop-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 15px;
+        margin-top: 120px;
+    }
+    
+    .product-info {
+        padding: 15px;
+    }
+    
+    .order-info-box {
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .email-address {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
+
+/* ===== USERNAME ANZEIGE ===== */
+.user-nav-item {
+    margin-left: auto;
+    margin-right: 0 !important;
+}
+
+.user-nav-link {
+    padding: 10px 15px !important;
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid transparent !important;
+    color: #667eea !important;
+    font-weight: 600;
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-nav-link:hover {
+    background: rgba(102, 126, 234, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: white;
+    font-weight: bold;
+}
+
+/* Responsive für Username-Anzeige */
+@media (max-width: 768px) {
+    .user-nav-item {
+        margin-left: 0;
+        width: 100%;
+        order: -1;
+    }
+    
+    .user-nav-link {
+        width: 100% !important;
+        justify-content: center !important;
+        border-left: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* ===== SHOP SEITE ===== */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 100px auto 50px;
+    padding: 20px;
+}
+
+.shop-item {
+    background-color: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 0;
+    border: 2px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.coin-item {
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.coin-item:hover {
+    border-color: rgba(255, 215, 0, 0.6);
+}
+
+.shop-item:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255,255,255,0.3);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.shop-item:hover .product-image img {
+    transform: scale(1.05);
+}
+
+.product-info {
+    padding: 20px;
+    background-color: black;
+}
+
+.product-info h3 {
+    color: white;
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.product-description {
+    color: #aaa;
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    line-height: 1.4;
+    min-height: 40px;
+}
+
+.coin-price-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 15px 0;
+}
+
+.coin-amount {
+    color: #FFD700;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.product-price {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 15px 0;
+}
+
+.order-info-box {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.order-info-box h3 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.order-info-box p {
+    color: #ddd;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.email-address {
+    background: rgba(102, 126, 234, 0.2);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 18px;
+    color: #667eea;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.order-info-box ul {
+    text-align: left;
+    color: #ddd;
+    margin: 20px auto;
+    max-width: 400px;
+}
+
+.order-info-box li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.order-note {
+    font-style: italic;
+    color: #FFD700;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+/* Responsive Shop */
+@media (max-width: 768px) {
+    .shop-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 15px;
+        margin-top: 120px;
+    }
+    
+    .product-info {
+        padding: 15px;
+    }
+    
+    .order-info-box {
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .email-address {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
+
+/* ===== WARENKORB BUTTONS ===== */
+.add-to-cart-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+}
+
+/* Cart Count in Navigation */
+.cart-count {
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 5px;
+    min-width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Game Art Images */
+.game-art {
+    width: 100%;
+    height: 300px;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    position: relative;
+}
+
+.game-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 768px) {
+    .game-art {
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-art {
+        height: 200px;
+    }
+}
+
+/* Guthaben Management Styles */
+.balance-management-section {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 2px solid rgba(255,255,255,0.1);
+}
+
+.balance-controls {
+    background: rgba(255,255,255,0.05);
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.balance-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.balance-result {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+}
+
+.balance-success {
+    background: rgba(40, 167, 69, 0.2);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    color: #28a745;
+}
+
+.balance-error {
+    background: rgba(220, 53, 69, 0.2);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+}
+
+.balance-info {
+    background: rgba(23, 162, 184, 0.2);
+    border: 1px solid rgba(23, 162, 184, 0.3);
+    color: #17a2b8;
+}
+
+.all-users-balance {
+    margin-top: 30px;
+}
+
+.user-balance-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-balance-info {
+    flex-grow: 1;
+}
+
+.user-balance-name {
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.user-balance-amount {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.user-balance-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.balance-positive {
+    color: #28a745;
+}
+
+.balance-zero {
+    color: #ffc107;
+}
+
+.balance-negative {
+    color: #dc3545;
+}
+
+.coin-icon {
+    color: #FFD700;
+    margin-right: 5px;
+}
+
+/* Buff Coins spezifische Styles */
+.coin-balance-display {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.1) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.coin-balance-amount {
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFD700;
+    margin: 10px 0;
+}
+
+.coin-balance-label {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.quick-balance-actions {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.quick-balance-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.quick-add {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.quick-subtract {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+/* Shop Item mit Coin Balance */
+.coin-shop-item {
+    position: relative;
+    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+}
+
+.coin-shop-item::before {
+    content: "💰";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+}
+
+.balance-checkout-btn {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+    color: black !important;
+    font-weight: bold;
+}
+
+.balance-checkout-btn:disabled {
+    background: #666 !important;
+    color: #999 !important;
+    cursor: not-allowed;
+}
+
+.balance-nav-item {
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.balance-nav-item a {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 20px;
+    padding: 8px 15px;
+    transition: all 0.3s ease;
+}
+
+.balance-nav-item a:hover {
+    background: rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px);
+}

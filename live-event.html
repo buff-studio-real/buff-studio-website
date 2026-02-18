@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Event - Buff Studio</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        .live-event-container {
+            max-width: 1200px;
+            margin: 100px auto 50px;
+            padding: 0 20px;
+        }
+
+        .event-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 71, 87, 0.1);
+            border: 2px solid #ff4757;
+            border-radius: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .live-badge {
+            background: #ff4757;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .event-title {
+            color: white;
+            font-size: 32px;
+            margin: 10px 0;
+        }
+
+        .event-description {
+            color: #aaa;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .event-time {
+            color: #ffa502;
+            font-size: 14px;
+        }
+
+        .chat-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .chat-main {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-messages {
+            height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #667eea;
+        }
+
+        .admin-message {
+            background: rgba(255, 71, 87, 0.1);
+            border-left: 3px solid #ff4757;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .message-username {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .admin-badge {
+            background: #ff4757;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+
+        .message-time {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .message-text {
+            color: white;
+            word-wrap: break-word;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .chat-sidebar {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .online-users {
+            margin-bottom: 20px;
+        }
+
+        .user-count {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .user-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            color: white;
+            padding: 5px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-status {
+            width: 8px;
+            height: 8px;
+            background: #2ed573;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .event-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .info-title {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .no-event {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+
+        .no-event h2 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #aaa;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #ff4757;
+            padding: 40px;
+        }
+
+        /* Scrollbar Styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+
+        .user-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .user-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .user-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Startseite</a></li>
+            <li><a href="aboutus.html">Über uns</a></li>
+            <li><a href="team.html">Unser Team</a></li>
+            <li><a href="games.html">Spiele</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <!-- Admin Link - wird nur für Admins angezeigt -->
+            <li id="adminNavItem" style="display: none;">
+                <a href="shopadmin.html" style="color: #FFD700;">Admin</a>
+            </li>
+            <!-- Live Event Button - wird nur bei aktiven Events angezeigt -->
+            <li id="liveEventNavItem" style="display: none;">
+                <a href="live-event.html" style="color: #ff4757; font-weight: bold; animation: pulse 2s infinite;">
+                    🔴 LIVE Event
+                </a>
+            </li>
+            <li class="login-nav-item">
+                <!-- Wird durch JavaScript gefüllt -->
+            </li>
+            <li class="balance-nav-item" style="display: none;">
+                <a href="javascript:void(0)" style="color: #FFD700; font-weight: bold;">
+                    💰 <span id="navBalance">0,00</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="live-event-container">
+        <div id="eventContent">
+            <div class="loading">Lade Event...</div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://rxalirtnxbspphoiriux.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4YWxpcnRueGJzcHBob2lyaXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMDE1ODMsImV4cCI6MjA3NzY3NzU4M30.cepc0jFeVYDwU1k0-qt66Sdig7iVUdqTkvtbGu6jrHY';
+
+        // Supabase Client initialisieren
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+    <script src="common.js"></script>
+    
+    <script>
+        let currentEvent = null;
+        let currentUser = null;
+        let chatInterval = null;
+        let onlineUsers = new Set();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLiveEvent();
+        });
+
+       async function initializeLiveEvent() {
+    // Aktuellen Benutzer laden
+    currentUser = getCurrentUser();
+    if (!currentUser) {
+        showLoginRequired();
+        return;
+    }
+
+    // Aktives Event laden
+    await loadCurrentEvent();
+    
+    // Online-Status sofort setzen
+    updateOnlineStatus();
+}
+
+        async function loadCurrentEvent() {
+            try {
+                const { data: events, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .eq('is_active', true)
+                    .gt('end_time', new Date().toISOString())
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+                
+                if (error) {
+                    console.error('Fehler beim Laden des Events:', error);
+                    showError('Fehler beim Laden des Events');
+                    return;
+                }
+
+                if (events && events.length > 0) {
+                    currentEvent = events[0];
+                    displayEvent();
+                    startChat();
+                } else {
+                    showNoEvent();
+                }
+
+            } catch (error) {
+                console.error('Fehler:', error);
+                showError('Fehler beim Laden des Events');
+            }
+        }
+
+        function displayEvent() {
+            const eventContent = document.getElementById('eventContent');
+            
+            eventContent.innerHTML = `
+                <div class="event-header">
+                    <div class="live-badge">🔴 LIVE</div>
+                    <h1 class="event-title">${currentEvent.title}</h1>
+                    <p class="event-description">${currentEvent.description || ''}</p>
+                    <div class="event-time">
+                        Endet: ${new Date(currentEvent.end_time).toLocaleString('de-DE')}
+                    </div>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-main">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="loading">Lade Nachrichten...</div>
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Schreibe eine Nachricht..." maxlength="500">
+                            <button class="send-btn" id="sendBtn" onclick="sendMessage()">Senden</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-sidebar">
+                        <h3 class="sidebar-title">Event Info</h3>
+                        <div class="event-info">
+                            <div class="info-title">📅 Event Details</div>
+                            <div class="info-item">Gestartet: ${new Date(currentEvent.start_time).toLocaleString('de-DE')}</div>
+                            <div class="info-item">Endet: ${new Date(currentEvent.end_time).toLocaleString('de-DE')}</div>
+                            <div class="info-item">Host: ${currentEvent.created_by}</div>
+                        </div>
+                        
+                        <div class="online-users">
+                            <div class="sidebar-title">👥 Zuschauer</div>
+                            <div class="user-count" id="userCount">0 online</div>
+                            <div class="user-list" id="userList">
+                                <!-- Online users werden hier angezeigt -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Enter-Taste für Chat
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Online Status aktualisieren
+            updateOnlineStatus();
+        }
+
+        function startChat() {
+    // Alte Intervalle löschen
+    if (chatInterval) {
+        clearInterval(chatInterval);
+    }
+
+    // Sofort Nachrichten laden
+    loadChatMessages();
+    
+    // Alle 3 Sekunden Nachrichten aktualisieren
+    chatInterval = setInterval(() => {
+        loadChatMessages();
+        updateOnlineUsers();
+    }, 3000);
+
+    // Alle 30 Sekunden Online-Status aktualisieren (OHNE Ping!)
+    setInterval(updateOnlineStatus, 30000);
+}
+
+       async function loadChatMessages() {
+    try {
+        const { data: messages, error } = await supabase
+            .from('chat_messages')
+            .select('*')
+            .eq('event_id', currentEvent.id)
+            .order('created_at', { ascending: true });
+        
+        if (error) {
+            console.error('Fehler beim Laden der Nachrichten:', error);
+            return;
+        }
+
+        // Ping-Nachrichten filtern (unsichtbare Steuernachrichten)
+        const filteredMessages = (messages || []).filter(msg => 
+            msg.message !== '💚' && 
+            msg.message.trim() !== '' &&
+            !msg.message.startsWith('__PING__')
+        );
+
+        displayChatMessages(filteredMessages);
+
+    } catch (error) {
+        console.error('Fehler:', error);
+    }
+}
+
+        function displayChatMessages(messages) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            if (messages.length === 0) {
+                chatMessages.innerHTML = '<div class="no-event">Sei der Erste, der eine Nachricht schreibt! 🎉</div>';
+                return;
+            }
+
+            let messagesHTML = '';
+            
+            messages.forEach(message => {
+                const messageClass = message.is_admin ? 'admin-message' : 'user-message';
+                const time = new Date(message.created_at).toLocaleTimeString('de-DE', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                messagesHTML += `
+                    <div class="message ${messageClass}">
+                        <div class="message-header">
+                            <div>
+                                <span class="message-username">${message.username}</span>
+                                ${message.is_admin ? '<span class="admin-badge">ADMIN</span>' : ''}
+                            </div>
+                            <span class="message-time">${time}</span>
+                        </div>
+                        <div class="message-text">${escapeHtml(message.message)}</div>
+                    </div>
+                `;
+            });
+            
+            chatMessages.innerHTML = messagesHTML;
+            
+            // Automatisch nach unten scrollen
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+// Admin-Prüfungsfunktion für Live Event
+async function checkIfUserIsAdmin(username) {
+    try {
+        // Prüfen ob Supabase verfügbar ist
+        if (typeof supabase === 'undefined') {
+            console.log('Supabase nicht verfügbar');
+            return false;
+        }
+        
+        // Aus admins Tabelle laden
+        const { data: adminData, error } = await supabase
+            .from('admins')
+            .select('username')
+            .eq('username', username)
+            .single();
+        
+        if (error && error.code === 'PGRST116') {
+            // Tabelle existiert nicht, Fallback zu hardcoded Admins
+            console.log('Admins Tabelle nicht gefunden, verwende Fallback');
+            const hardcodedAdmins = ['Ungewoehnlicher', 'Lars', 'MAX_YT', 'Support'];
+            return hardcodedAdmins.includes(username);
+        }
+        
+        if (error) {
+            console.error('Fehler beim Laden der Admin-Daten:', error);
+            // Fallback zu hardcoded Admins
+            const hardcodedAdmins = ['Ungewoehnlicher', 'Lars', 'MAX_YT', 'Support'];
+            return hardcodedAdmins.includes(username);
+        }
+        
+        return !!adminData;
+        
+    } catch (error) {
+        console.error('Fehler beim Prüfen der Admin-Berechtigung:', error);
+        // Fallback zu hardcoded Admins
+        const hardcodedAdmins = ['Ungewoehnlicher', 'Lars', 'MAX_YT', 'Support'];
+        return hardcodedAdmins.includes(username);
+    }
+}
+    async function sendMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const message = chatInput.value.trim();
+    
+    if (!message) return;
+    
+    // Prüfen ob Benutzer eingeloggt ist
+    if (!currentUser) {
+        alert('Bitte einloggen um Nachrichten zu senden!');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Prüfen ob Event noch aktiv ist
+    if (new Date() > new Date(currentEvent.end_time)) {
+        alert('Dieses Event ist bereits beendet!');
+        window.location.reload();
+        return;
+    }
+
+    // Button deaktivieren während des Sendens
+    const sendBtn = document.getElementById('sendBtn');
+    const originalText = sendBtn.textContent;
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending...';
+
+    try {
+        // Prüfen ob Benutzer Admin ist
+        const isAdmin = await checkIfUserIsAdmin(currentUser.username);
+        
+        console.log('Sende Nachricht:', {
+            event_id: currentEvent.id,
+            username: currentUser.username,
+            message: message,
+            is_admin: isAdmin
+        });
+        
+        const { data, error } = await supabase
+            .from('chat_messages')
+            .insert([{
+                event_id: currentEvent.id,
+                username: currentUser.username,
+                message: message,
+                is_admin: isAdmin,
+                created_at: new Date().toISOString()
+            }])
+            .select();
+        
+        if (error) {
+            console.error('Supabase Fehler:', error);
+            
+            if (error.code === '42P01') {
+                alert('❌ Chat-System ist noch nicht fertig eingerichtet.');
+            } else {
+                alert('❌ Fehler beim Senden: ' + error.message);
+            }
+            return;
+        }
+
+        console.log('Nachricht erfolgreich gesendet:', data);
+        
+        // Input leeren
+        chatInput.value = '';
+        
+        // Online Status aktualisieren (OHNE Ping-Nachricht!)
+        updateOnlineStatus();
+        
+        // Erfolgsmeldung anzeigen
+        showTempMessage('✅ Nachricht gesendet!');
+
+    } catch (error) {
+        console.error('Allgemeiner Fehler:', error);
+        alert('❌ Netzwerkfehler: ' + error.message);
+    } finally {
+        // Button wieder aktivieren
+        sendBtn.disabled = false;
+        sendBtn.textContent = originalText;
+    }
+}
+
+// Temporäre Erfolgsmeldung anzeigen
+function showTempMessage(message) {
+    const tempDiv = document.createElement('div');
+    tempDiv.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: #2ed573;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 10000;
+        font-weight: bold;
+    `;
+    tempDiv.textContent = message;
+    document.body.appendChild(tempDiv);
+    
+    setTimeout(() => {
+        document.body.removeChild(tempDiv);
+    }, 3000);
+}
+
+        async function updateOnlineUsers() {
+    try {
+        // Online-Status aus localStorage laden
+        const onlineKey = `online_${currentEvent.id}`;
+        const onlineData = JSON.parse(localStorage.getItem(onlineKey)) || {};
+        
+        // Veraltete Einträge entfernen
+        const twoMinutesAgo = Date.now() - 2 * 60 * 1000;
+        Object.keys(onlineData).forEach(username => {
+            if (onlineData[username] < twoMinutesAgo) {
+                delete onlineData[username];
+            }
+        });
+        
+        localStorage.setItem(onlineKey, JSON.stringify(onlineData));
+        
+        onlineUsers = new Set(Object.keys(onlineData));
+        displayOnlineUsers();
+
+    } catch (error) {
+        console.error('Fehler beim Laden der Online-Benutzer:', error);
+    }
+}
+
+        function displayOnlineUsers() {
+            const userCount = document.getElementById('userCount');
+            const userList = document.getElementById('userList');
+            
+            if (userCount) {
+                userCount.textContent = `${onlineUsers.size} Zuschauer online`;
+            }
+            
+            if (userList) {
+                let usersHTML = '';
+                onlineUsers.forEach(username => {
+                    usersHTML += `
+                        <div class="user-item">
+                            <div class="user-status"></div>
+                            ${username}
+                        </div>
+                    `;
+                });
+                userList.innerHTML = usersHTML || '<div style="color: #888; font-size: 14px;">Keine aktiven Zuschauer</div>';
+            }
+        }
+
+        async function updateOnlineStatus() {
+    if (!currentEvent || !currentUser) return;
+    
+    try {
+        // Online-Status in einer separaten Tabelle speichern
+        // oder localStorage verwenden, statt Chat-Nachrichten
+        const onlineKey = `online_${currentEvent.id}`;
+        let onlineData = JSON.parse(localStorage.getItem(onlineKey)) || {};
+        
+        // Aktuellen Benutzer als online markieren
+        onlineData[currentUser.username] = Date.now();
+        
+        // Veraltete Einträge entfernen (älter als 2 Minuten)
+        const twoMinutesAgo = Date.now() - 2 * 60 * 1000;
+        Object.keys(onlineData).forEach(username => {
+            if (onlineData[username] < twoMinutesAgo) {
+                delete onlineData[username];
+            }
+        });
+        
+        localStorage.setItem(onlineKey, JSON.stringify(onlineData));
+        
+        // Online-Liste aktualisieren
+        updateOnlineUsersFromStorage();
+        
+    } catch (error) {
+        console.error('Fehler beim Aktualisieren des Online-Status:', error);
+    }
+}
+
+function updateOnlineUsersFromStorage() {
+    const onlineKey = `online_${currentEvent.id}`;
+    const onlineData = JSON.parse(localStorage.getItem(onlineKey)) || {};
+    
+    onlineUsers = new Set(Object.keys(onlineData));
+    displayOnlineUsers();
+}
+
+        function showNoEvent() {
+            const eventContent = document.getElementById('eventContent');
+            eventContent.innerHTML = `
+                <div class="no-event">
+                    <h2>🔕 Kein aktives Event</h2>
+                    <p>Momentan findet kein Live Event statt.</p>
+                    <p>Schau später wieder vorbei oder folge uns für Updates!</p>
+                </div>
+            `;
+        }
+
+        function showLoginRequired() {
+            const eventContent = document.getElementById('eventContent');
+            eventContent.innerHTML = `
+                <div class="no-event">
+                    <h2>🔐 Login erforderlich</h2>
+                    <p>Bitte logge dich ein um am Live Event teilzunehmen!</p>
+                    <button onclick="window.location.href='login.html'" 
+                            style="margin-top: 20px; padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Jetzt einloggen
+                    </button>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const eventContent = document.getElementById('eventContent');
+            eventContent.innerHTML = `
+                <div class="error-message">
+                    <h2>❌ Fehler</h2>
+                    <p>${message}</p>
+                    <button onclick="location.reload()" 
+                            style="margin-top: 20px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        Erneut versuchen
+                    </button>
+                </div>
+            `;
+        }
+
+        // Hilfsfunktionen
+        function getCurrentUser() {
+            const sessionUser = sessionStorage.getItem('current_user');
+            const rememberedUser = localStorage.getItem('remembered_user');
+            
+            if (sessionUser) {
+                return JSON.parse(sessionUser);
+            } else if (rememberedUser) {
+                return JSON.parse(rememberedUser);
+            }
+            return null;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Aufräumen beim Verlassen der Seite
+        window.addEventListener('beforeunload', function() {
+            if (chatInterval) {
+                clearInterval(chatInterval);
+            }
+        });
+    </script>
+</body>
+</html>

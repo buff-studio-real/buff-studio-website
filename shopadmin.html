@@ -1,0 +1,2867 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Admin - Buff Studio</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Alle bestehenden Styles bleiben gleich */
+        .admin-container {
+            max-width: 1200px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .admin-card {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .total-revenue {
+            color: #28a745;
+        }
+
+        .total-orders {
+            color: #007bff;
+        }
+
+        .pending-orders {
+            color: #ffc107;
+        }
+
+        .total-users {
+            color: #6f42c1;
+        }
+
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .admin-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .admin-tab:hover {
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .orders-table th {
+            color: #667eea;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .orders-table td {
+            color: white;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-completed {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .complete-btn {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .complete-btn:hover {
+            background: rgba(40, 167, 69, 0.3);
+        }
+
+        .delete-btn {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .delete-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+        }
+
+        .user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .user-info h4 {
+            color: white;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .user-info p {
+            color: #aaa;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .user-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-left: 10px;
+        }
+
+        .badge-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .badge-tag {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .badge-premium {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .badge-verified {
+            background: linear-gradient(135deg, rgba(46, 213, 115, 0.2) 0%, rgba(0, 184, 148, 0.2) 100%);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .badge-admin {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.2) 0%, rgba(255, 0, 0, 0.2) 100%);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .badge-developer {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .badge-supporter {
+            background: linear-gradient(135deg, rgba(255, 165, 2, 0.2) 0%, rgba(255, 140, 0, 0.2) 100%);
+            color: #ffa502;
+            border: 1px solid rgba(255, 165, 2, 0.3);
+        }
+
+        .badge-booster {
+            background: linear-gradient(135deg, rgba(255, 46, 99, 0.2) 0%, rgba(255, 0, 128, 0.2) 100%);
+            color: #ff2e63;
+            border: 1px solid rgba(255, 46, 99, 0.3);
+        }
+
+        .user-balance {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .user-coins {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 16px;
+            margin-left: 15px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .update-balance-btn {
+            padding: 6px 12px;
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .update-balance-btn:hover {
+            background: rgba(255, 193, 7, 0.3);
+        }
+
+        .badge-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-badge-btn {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .add-badge-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        .remove-badge-btn {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .remove-badge-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            color: #aaa;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #aaa;
+            padding: 60px 20px;
+        }
+
+        .admin-alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .alert-error {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+
+        .balance-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .balance-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30, 30, 30, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .save-btn {
+            flex: 0.85;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .debug-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #aaa;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .sql-help {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .user-balance-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Badge Selector Styles */
+        .badge-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .badge-option {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #667eea;
+        }
+
+        .badge-option.selected {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .badge-option-icon {
+            font-size: 20px;
+        }
+
+        .badge-option-name {
+            color: white;
+            font-size: 12px;
+        }
+
+        .current-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .current-badge {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-badge-icon {
+            font-size: 16px;
+        }
+
+        .current-badge-name {
+            color: white;
+            font-size: 12px;
+        }
+
+        .remove-current-badge {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 5px;
+        }
+
+        .remove-current-badge:hover {
+            color: #ff4757;
+        }
+
+        .badge-filter {
+            margin-bottom: 15px;
+        }
+
+        .employee-section {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .current-employee {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .employee-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .employee-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .employee-option.selected {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .employee-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .product-price {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .product-description {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .edit-btn:hover {
+            background: rgba(255, 193, 7, 0.3);
+        }
+
+        .admin-badge {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .make-admin-btn {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .make-admin-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+        }
+
+        .remove-admin-btn {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .remove-admin-btn:hover {
+            background: rgba(40, 167, 69, 0.3);
+        }
+        
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .event-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .event-active {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+        
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .event-title {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .event-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+        
+        .status-inactive {
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        .verified-icon {
+            width: 20px;
+            height: 20px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Startseite</a></li>
+            <li><a href="aboutus.html">Über uns</a></li>
+            <li><a href="team.html">Unser Team</a></li>
+            <li><a href="games.html">Spiele</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li id="adminNavItem" style="display: none;">
+                <a href="shopadmin.html" style="color: #FFD700;">Admin</a>
+            </li>
+            <li id="liveEventNavItem" style="display: none;">
+                <a href="javascript:void(0)" style="color: #ff4757; font-weight: bold;">
+                    🔴 LIVE Event
+                </a>
+            </li>
+            <li class="login-nav-item"></li>
+            <li class="balance-nav-item" style="display: none;">
+                <a href="javascript:void(0)" style="color: #FFD700; font-weight: bold;">
+                    💰 <span id="navBalance">0,00</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1 class="buffstudio-logotext">Shop Admin Bereich</h1>
+            <p class="buffstudio-centergreytext">Verwalte Bestellungen, Benutzer, Produkte und Badges</p>
+        </div>
+
+        <div id="adminAlert" style="display: none;"></div>
+
+        <div class="admin-card">
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <div class="stat-value total-revenue" id="totalRevenue">€0,00</div>
+                    <div class="stat-label">Gesamtumsatz</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value total-orders" id="totalOrders">0</div>
+                    <div class="stat-label">Bestellungen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value pending-orders" id="pendingOrders">0</div>
+                    <div class="stat-label">Ausstehend</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value total-users" id="totalUsers">0</div>
+                    <div class="stat-label">Benutzer</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="save-btn" onclick="AdminJS.testPermissions()" style="margin-right: 10px;">🔧 Berechtigungen testen</button>
+                <button class="cancel-btn" onclick="AdminJS.showDebugInfo()">🐛 Debug Info</button>
+                <button class="cancel-btn" onclick="AdminJS.fixDatabaseSchema()">🗃️ Schema reparieren</button>
+            </div>
+
+            <div class="sql-help" id="sqlHelp" style="display: none;">
+                <h4>📋 SQL-Befehle für Supabase:</h4>
+                <pre id="sqlCommands"></pre>
+                <p><small>Diese Befehle im Supabase SQL-Editor ausführen</small></p>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="AdminJS.switchTab('orders')">📦 Bestellungen</button>
+                <button class="admin-tab" onclick="AdminJS.switchTab('users')">👥 Benutzer</button>
+                <button class="admin-tab" onclick="AdminJS.switchTab('badges')">🏆 Badges</button>
+                <button class="admin-tab" onclick="AdminJS.switchTab('employee')">🏆 Mitarbeiter</button>
+                <button class="admin-tab" onclick="AdminJS.switchTab('products')">🛍️ Produkte</button>
+                <button class="admin-tab" onclick="AdminJS.switchTab('admins')">🔐 Admins</button>
+                <button class="admin-tab" onclick="AdminJS.switchTab('events')">🎪 Live Events</button>
+            </div>
+
+            <!-- Bestellungen Tab -->
+            <div class="tab-content active" id="ordersTab">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="orderSearch" placeholder="Nach Bestellungen suchen..." onkeyup="AdminJS.searchOrders()">
+                </div>
+                <div class="orders-list" id="ordersList">
+                    <div class="loading">Lade Bestellungen...</div>
+                </div>
+            </div>
+
+            <!-- Benutzer Tab -->
+            <div class="tab-content" id="usersTab">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="userSearch" placeholder="Nach Benutzern suchen..." onkeyup="AdminJS.searchUsers()">
+                </div>
+                <div class="users-list" id="usersList">
+                    <div class="loading">Lade Benutzer...</div>
+                </div>
+            </div>
+
+            <!-- Badges Tab (NEU) -->
+            <div class="tab-content" id="badgesTab">
+                <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: white; margin: 0;">Badge Verwaltung</h3>
+                    <button class="save-btn" onclick="AdminJS.openBadgeModal()">➕ Neues Badge</button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" id="badgeSearch" placeholder="Nach Badges suchen..." onkeyup="AdminJS.searchBadges()">
+                </div>
+                
+                <div class="products-grid" id="badgesList">
+                    <div class="loading">Lade Badges...</div>
+                </div>
+            </div>
+
+            <!-- Mitarbeiter des Monats Tab -->
+            <div class="tab-content" id="employeeTab">
+                <div class="employee-section">
+                    <div class="current-employee">
+                        🏆 Aktueller Mitarbeiter des Monats: <span id="currentEmployeeName">Wird geladen...</span>
+                    </div>
+
+                    <h3 style="color: white; margin-bottom: 20px;">Mitarbeiter des Monats auswählen</h3>
+                    
+                    <div class="employee-grid" id="employeeGrid">
+                        <!-- Wird durch JavaScript gefüllt -->
+                    </div>
+
+                    <div class="employee-actions">
+                        <button class="save-btn" onclick="AdminJS.saveEmployeeOfMonth()">
+                            ✅ Auswahl bestätigen
+                        </button>
+                        <button class="cancel-btn" onclick="AdminJS.clearEmployeeOfMonth()">
+                            ❌ Zurücksetzen
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 30px; color: #aaa; font-size: 14px;">
+                        <p>Der ausgewählte Mitarbeiter wird auf der Team-Seite mit einem goldenen Rahmen und Badge hervorgehoben.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produkte Tab -->
+            <div class="tab-content" id="productsTab">
+                <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: white; margin: 0;">Produktverwaltung</h3>
+                    <button class="save-btn" onclick="AdminJS.openProductModal()">➕ Neues Produkt</button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" id="productSearch" placeholder="Nach Produkten suchen..." onkeyup="AdminJS.searchProducts()">
+                </div>
+                
+                <div class="products-grid" id="productsList">
+                    <div class="loading">Lade Produkte...</div>
+                </div>
+            </div>
+
+            <!-- Admin-Verwaltung Tab -->
+            <div class="tab-content" id="adminsTab">
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: white; margin-bottom: 15px;">Admin-Benutzer verwalten</h3>
+                    <p style="color: #aaa;">Hier können Sie Benutzern Admin-Berechtigungen erteilen oder entziehen.</p>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" id="adminSearch" placeholder="Nach Benutzern suchen..." onkeyup="AdminJS.searchAdmins()">
+                </div>
+                
+                <div class="users-list" id="adminsList">
+                    <div class="loading">Lade Benutzer...</div>
+                </div>
+            </div>
+
+            <!-- Live Events Tab -->
+            <div class="tab-content" id="eventsTab">
+                <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: white; margin: 0;">Live Event Management</h3>
+                    <button class="save-btn" onclick="AdminJS.openEventModal()">➕ Neues Event</button>
+                </div>
+                
+                <div class="admin-card" style="margin-bottom: 20px;">
+                    <h4 style="color: white; margin-bottom: 15px;">Aktives Event</h4>
+                    <div id="currentActiveEvent">
+                        <div class="empty-state">Kein aktives Event</div>
+                    </div>
+                </div>
+                
+                <div class="admin-card">
+                    <h4 style="color: white; margin-bottom: 15px;">Vergangene Events</h4>
+                    <div id="pastEventsList">
+                        <div class="loading">Lade Events...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Debug Info -->
+            <div class="debug-info" id="debugInfo" style="display: none;">
+                <h4>Debug Information:</h4>
+                <div id="debugContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Balance Modal -->
+    <div class="balance-modal" id="balanceModal">
+        <div class="balance-modal-content">
+            <div class="modal-header">
+                <h3 style="color: white; margin: 0;">Guthaben bearbeiten</h3>
+                <button class="close-modal" onclick="AdminJS.closeBalanceModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="balanceAmount">Neues Guthaben (€)</label>
+                <input type="number" id="balanceAmount" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label for="coinsAmount">Coins</label>
+                <input type="number" id="coinsAmount" min="0" placeholder="0">
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="AdminJS.closeBalanceModal()">Abbrechen</button>
+                <button class="save-btn" onclick="AdminJS.saveBalance()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Badge Modal (NEU) -->
+    <div class="balance-modal" id="badgeModal">
+        <div class="balance-modal-content">
+            <div class="modal-header">
+                <h3 style="color: white; margin: 0;" id="badgeModalTitle">Badge zuweisen</h3>
+                <button class="close-modal" onclick="AdminJS.closeBadgeModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="badgeUser">Benutzer</label>
+                <input type="text" id="badgeUser" placeholder="Benutzername" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label>Aktuelle Badges</label>
+                <div class="current-badges" id="currentUserBadges">
+                    <div style="color: #aaa;">Keine Badges</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Verfügbare Badges</label>
+                <input type="text" class="search-input" id="badgeFilter" placeholder="Badge suchen..." onkeyup="AdminJS.filterBadges()" style="margin-bottom: 10px;">
+                <div class="badge-selector" id="badgeSelector">
+                    <div class="loading">Lade Badges...</div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="AdminJS.closeBadgeModal()">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="balance-modal" id="productModal">
+        <div class="balance-modal-content">
+            <div class="modal-header">
+                <h3 style="color: white; margin: 0;" id="productModalTitle">Neues Produkt</h3>
+                <button class="close-modal" onclick="AdminJS.closeProductModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="productName">Produktname *</label>
+                <input type="text" id="productName" placeholder="z.B. Premium Booster">
+            </div>
+            <div class="form-group">
+                <label for="productDescription">Beschreibung *</label>
+                <textarea id="productDescription" placeholder="Beschreibe das Produkt..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="productPrice">Preis (€) *</label>
+                <input type="number" id="productPrice" step="0.01" min="0" placeholder="4.99">
+            </div>
+            <div class="form-group">
+                <label for="productCategory">Kategorie *</label>
+                <select id="productCategory">
+                    <option value="booster">Booster</option>
+                    <option value="currency">Währung</option>
+                    <option value="cosmetic">Kosmetik</option>
+                    <option value="other">Sonstiges</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="productImage">Bild-URL (optional)</label>
+                <input type="text" id="productImage" placeholder="img/booster.png">
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="AdminJS.closeProductModal()">Abbrechen</button>
+                <button class="save-btn" onclick="AdminJS.saveProduct()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="balance-modal" id="eventModal">
+        <div class="balance-modal-content">
+            <div class="modal-header">
+                <h3 style="color: white; margin: 0;" id="eventModalTitle">Neues Live Event</h3>
+                <button class="close-modal" onclick="AdminJS.closeEventModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="eventTitle">Event Titel *</label>
+                <input type="text" id="eventTitle" placeholder="z.B. Sommer Special Event">
+            </div>
+            <div class="form-group">
+                <label for="eventDescription">Beschreibung</label>
+                <textarea id="eventDescription" placeholder="Beschreibe das Event..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="eventStartTime">Startzeit *</label>
+                <input type="datetime-local" id="eventStartTime">
+            </div>
+            <div class="form-group">
+                <label for="eventEndTime">Endzeit *</label>
+                <input type="datetime-local" id="eventEndTime">
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="AdminJS.closeEventModal()">Abbrechen</button>
+                <button class="save-btn" onclick="AdminJS.saveEvent()">Event starten</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Supabase Konfiguration
+    const SUPABASE_URL = 'https://rxalirtnxbspphoiriux.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4YWxpcnRueGJzcHBob2lyaXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMDE1ODMsImV4cCI6MjA3NzY3NzU4M30.cepc0jFeVYDwU1k0-qt66Sdig7iVUdqTkvtbGu6jrHY';
+    
+    // Admin JS Objekt
+    const AdminJS = {
+        supabase: null,
+        currentUser: null,
+        allOrders: [],
+        allUsers: [],
+        allProducts: [],
+        allAdmins: [],
+        allEvents: [],
+        allBadges: [],
+        selectedUserId: null,
+        selectedEmployee: null,
+        editingProductId: null,
+        editingEventId: null,
+        editingBadgeId: null,
+        
+        teamMembers: [
+            'Max', 'Lars', 'Johannes', 'Kaleo', 'Taylor', 'Silviu', 
+            'Larissa', 'Alessio', 'Nikita', 'Benedikt', 'Roman', 'Sandro', 'Kristjan', 'Benno'
+        ],
+        
+        initSupabase: function() {
+            try {
+                if (typeof supabase !== 'undefined' && supabase !== null && typeof supabase.createClient === 'function') {
+                    console.log('🔄 Erstelle Supabase Client in AdminJS');
+                    this.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                        auth: {
+                            persistSession: true,
+                            autoRefreshToken: true
+                        }
+                    });
+                    console.log('✅ Supabase Client erfolgreich initialisiert');
+                    return this.supabase;
+                } else {
+                    console.error('❌ Supabase SDK nicht geladen');
+                    return null;
+                }
+            } catch (error) {
+                console.error('❌ Fehler bei Supabase Initialisierung:', error);
+                return null;
+            }
+        },
+        
+        getSupabaseClient: function() {
+            if (this.supabase) return this.supabase;
+            return this.initSupabase();
+        },
+        
+        getCurrentUser: function() {
+            const sessionUser = sessionStorage.getItem('current_user');
+            if (sessionUser) {
+                try {
+                    return JSON.parse(sessionUser);
+                } catch (e) {
+                    console.error('Fehler beim Parsen des sessionStorage Users:', e);
+                }
+            }
+            
+            const rememberedUser = localStorage.getItem('remembered_user');
+            if (rememberedUser) {
+                try {
+                    return JSON.parse(rememberedUser);
+                } catch (e) {
+                    console.error('Fehler beim Parsen des localStorage Users:', e);
+                }
+            }
+            
+            return null;
+        },
+        
+        logoutUser: function() {
+            if (confirm('Möchtest du dich wirklich abmelden?')) {
+                sessionStorage.removeItem('current_user');
+                localStorage.removeItem('remembered_user');
+                window.location.href = 'index.html';
+            }
+        },
+        
+        checkIfUserIsAdminSync: function(username) {
+            const adminUsers = ['Ungewoehnlicher', 'Lars', 'MAX_YT'];
+            return adminUsers.includes(username);
+        },
+        
+        formatEuro: function(amount) {
+            return '€' + parseFloat(amount).toFixed(2).replace('.', ',');
+        },
+        
+        init: async function() {
+            console.log('Admin Seite initialisiert');
+            this.supabase = this.initSupabase();
+            this.currentUser = this.getCurrentUser();
+            console.log('Aktueller Benutzer:', this.currentUser);
+            await this.checkAdminAccess();
+        },
+        
+        checkAdminAccess: async function() {
+            try {
+                this.currentUser = this.getCurrentUser();
+                
+                if (!this.currentUser) {
+                    this.showAlert('Bitte einloggen!', 'error');
+                    setTimeout(() => window.location.href = 'login.html', 2000);
+                    return;
+                }
+                
+                const isAdmin = await this.checkIfUserIsAdmin(this.currentUser.username);
+                if (!isAdmin) {
+                    this.showAlert('Zugriff verweigert! Nur für Administratoren.', 'error');
+                    setTimeout(() => window.location.href = 'index.html', 2000);
+                    return;
+                }
+                
+                console.log('✅ Admin-Zugriff gewährt für:', this.currentUser.username);
+                await this.initializeAdmin();
+                
+            } catch (error) {
+                console.error('Fehler beim Prüfen des Admin-Zugriffs:', error);
+                this.showAlert('Fehler beim Prüfen der Berechtigungen', 'error');
+            }
+        },
+        
+        checkIfUserIsAdmin: async function(username) {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) {
+                    return this.checkIfUserIsAdminSync(username);
+                }
+                
+                const { data: adminData, error } = await supabase
+                    .from('admins')
+                    .select('username')
+                    .eq('username', username)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Fehler beim Laden der Admin-Daten:', error);
+                }
+                
+                if (adminData) {
+                    return true;
+                }
+                
+                return this.checkIfUserIsAdminSync(username);
+                
+            } catch (error) {
+                console.error('Fehler beim Prüfen der Admin-Berechtigung:', error);
+                return this.checkIfUserIsAdminSync(username);
+            }
+        },
+        
+        initializeAdmin: async function() {
+            console.log('Initialisiere Admin-Bereich...');
+            await this.loadStats();
+            await this.loadOrders();
+            await this.loadUsers();
+            await this.loadProducts();
+            await this.loadAdmins();
+            await this.loadEvents();
+            await this.loadBadges();
+            await this.loadEmployeeOfMonth();
+            this.setupEmployeeGrid();
+        },
+        
+        loadStats: async function() {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { data: orders, error: ordersError } = await supabase
+                    .from('orders')
+                    .select('*');
+                
+                if (ordersError) {
+                    console.error('Fehler beim Laden der Bestellungen:', ordersError);
+                    return;
+                }
+                
+                const { data: users, error: usersError } = await supabase
+                    .from('users')
+                    .select('*');
+                
+                const totalRevenue = orders ? orders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0) : 0;
+                const pendingOrders = orders ? orders.filter(order => order.status === 'pending').length : 0;
+                const userCount = users ? users.length : 0;
+                
+                document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(2)}`;
+                document.getElementById('totalOrders').textContent = orders ? orders.length : 0;
+                document.getElementById('pendingOrders').textContent = pendingOrders;
+                document.getElementById('totalUsers').textContent = userCount;
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Statistiken:', error);
+            }
+        },
+        
+        loadOrders: async function() {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Fehler beim Laden der Bestellungen:', error);
+                    return;
+                }
+                
+                this.allOrders = orders || [];
+                this.displayOrders(this.allOrders);
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Bestellungen:', error);
+            }
+        },
+        
+        displayOrders: function(orders) {
+            const ordersListElement = document.getElementById('ordersList');
+            
+            if (!orders || orders.length === 0) {
+                ordersListElement.innerHTML = '<div class="empty-state">Keine Bestellungen gefunden</div>';
+                return;
+            }
+            
+            let ordersHTML = `
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Benutzer</th>
+                            <th>Produkte</th>
+                            <th>Gesamt</th>
+                            <th>Status</th>
+                            <th>Datum</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            orders.forEach(order => {
+                const orderDate = order.created_at ? new Date(order.created_at).toLocaleString('de-DE') : 'Unbekannt';
+                const items = Array.isArray(order.items) ? order.items : [];
+                const productNames = items.map(item => `${item.product} (${item.quantity}x)`).join(', ');
+                
+                ordersHTML += `
+                    <tr>
+                        <td>#${order.id}</td>
+                        <td>${order.user_id}<br><small>${order.user_email || ''}</small></td>
+                        <td>${productNames}</td>
+                        <td>€${parseFloat(order.total || 0).toFixed(2)}</td>
+                        <td>
+                            <span class="status-badge ${order.status === 'pending' ? 'status-pending' : 'status-completed'}">
+                                ${order.status === 'pending' ? 'Ausstehend' : 'Abgeschlossen'}
+                            </span>
+                        </td>
+                        <td>${orderDate}</td>
+                        <td>
+                            ${order.status === 'pending' ? `
+                                <button class="action-btn complete-btn" onclick="AdminJS.completeOrder(${order.id})">
+                                    ✅ Erledigt
+                                </button>
+                            ` : ''}
+                            <button class="action-btn delete-btn" onclick="AdminJS.deleteOrder(${order.id})">
+                                🗑️ Löschen
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            ordersHTML += '</tbody></table>';
+            ordersListElement.innerHTML = ordersHTML;
+        },
+        
+        completeOrder: async function(orderId) {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ status: 'completed' })
+                    .eq('id', orderId);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Aktualisieren: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert('Bestellung als erledigt markiert!', 'success');
+                await this.loadOrders();
+                await this.loadStats();
+                
+            } catch (error) {
+                console.error('Fehler beim Aktualisieren der Bestellung:', error);
+            }
+        },
+        
+        deleteOrder: async function(orderId) {
+            if (!confirm('Bestellung #' + orderId + ' wirklich löschen?')) return;
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('orders')
+                    .delete()
+                    .eq('id', orderId);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Löschen: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert('Bestellung gelöscht!', 'success');
+                await this.loadOrders();
+                await this.loadStats();
+                
+            } catch (error) {
+                console.error('Fehler beim Löschen der Bestellung:', error);
+            }
+        },
+        
+        loadUsers: async function() {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('username');
+                
+                if (error) {
+                    console.log('Users Tabelle nicht verfügbar:', error.message);
+                    return;
+                }
+                
+                this.allUsers = users || [];
+                await this.displayUsers();
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Benutzer:', error);
+            }
+        },
+        
+        displayUsers: async function() {
+            const usersListElement = document.getElementById('usersList');
+            
+            if (!this.allUsers || this.allUsers.length === 0) {
+                usersListElement.innerHTML = '<div class="empty-state">Keine Benutzer gefunden</div>';
+                return;
+            }
+            
+            let usersHTML = '';
+            
+            for (const user of this.allUsers) {
+                const userBalance = await this.getUserBalanceFromDB(user.username);
+                const userCoins = await this.getUserCoinsFromDB(user.username);
+                const isAdmin = await this.checkIfUserIsAdmin(user.username);
+                const userBadges = await this.getUserBadges(user.username);
+                
+                // Badges HTML erstellen
+                let badgesHTML = '';
+                if (userBadges && userBadges.length > 0) {
+                    badgesHTML = '<div class="user-badges">';
+                    userBadges.forEach(badge => {
+                        if (badge.name === 'verified') {
+                            badgesHTML += `<img src="img/verified.ico" class="badge-icon" title="${badge.display_name}" alt="Verified">`;
+                        } else {
+                            badgesHTML += `<span class="badge-tag badge-${badge.color_class || badge.name}">${badge.icon} ${badge.display_name}</span>`;
+                        }
+                    });
+                    badgesHTML += '</div>';
+                }
+                
+                usersHTML += `
+                    <div class="user-row">
+                        <div class="user-info">
+                            <h4>
+                                ${user.username} ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
+                                ${badgesHTML}
+                            </h4>
+                            <p>${user.email || 'Keine Email'} | Registriert: ${user.created_at ? new Date(user.created_at).toLocaleDateString('de-DE') : 'Unbekannt'}</p>
+                        </div>
+                        <div class="user-balance-container">
+                            <div class="user-balance">
+                                ${this.formatEuro(userBalance)}
+                            </div>
+                            <div class="user-coins">
+                                ${userCoins} Coins
+                            </div>
+                        </div>
+                        <div class="admin-actions">
+                            <button class="update-balance-btn" onclick="AdminJS.openBalanceModal('${user.username}', ${userBalance}, ${userCoins})">
+                                💰 Bearbeiten
+                            </button>
+                            <button class="add-badge-btn" onclick="AdminJS.openBadgeModal('${user.username}')">
+                                🏆 Badges
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            usersListElement.innerHTML = usersHTML;
+        },
+        
+        getUserBalanceFromDB: async function(username) {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return 0;
+                
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('balance')
+                    .eq('username', username)
+                    .single();
+                
+                if (error) return 0;
+                
+                return parseFloat(userData.balance || 0);
+            } catch (error) {
+                return 0;
+            }
+        },
+        
+        getUserCoinsFromDB: async function(username) {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return 0;
+                
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('coins')
+                    .eq('username', username)
+                    .single();
+                
+                if (error) return 0;
+                
+                return parseInt(userData.coins || 0);
+            } catch (error) {
+                return 0;
+            }
+        },
+        
+        getUserBadges: async function(username) {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return [];
+                
+                const { data: userBadges, error } = await supabase
+                    .from('user_badges')
+                    .select('badge_id')
+                    .eq('username', username);
+                
+                if (error || !userBadges || userBadges.length === 0) return [];
+                
+                const badgeIds = userBadges.map(ub => ub.badge_id);
+                
+                const { data: badges, error: badgesError } = await supabase
+                    .from('badges')
+                    .select('*')
+                    .in('id', badgeIds);
+                
+                if (badgesError) return [];
+                
+                return badges || [];
+            } catch (error) {
+                return [];
+            }
+        },
+        
+        openBalanceModal: function(username, currentBalance, currentCoins) {
+            this.selectedUserId = username;
+            document.getElementById('balanceAmount').value = currentBalance;
+            document.getElementById('coinsAmount').value = currentCoins;
+            document.getElementById('balanceModal').style.display = 'block';
+        },
+        
+        closeBalanceModal: function() {
+            document.getElementById('balanceModal').style.display = 'none';
+            this.selectedUserId = null;
+        },
+        
+        saveBalance: async function() {
+            const newBalance = parseFloat(document.getElementById('balanceAmount').value) || 0;
+            const newCoins = parseInt(document.getElementById('coinsAmount').value) || 0;
+            
+            if (!this.selectedUserId) {
+                this.showAlert('Kein Benutzer ausgewählt!', 'error');
+                return;
+            }
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('users')
+                    .update({ 
+                        balance: newBalance,
+                        coins: newCoins,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('username', this.selectedUserId);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Aktualisieren: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert('Guthaben und Coins erfolgreich aktualisiert!', 'success');
+                this.closeBalanceModal();
+                await this.loadUsers();
+                
+            } catch (error) {
+                console.error('Fehler beim Aktualisieren des Guthabens:', error);
+            }
+        },
+        
+        // Badges Funktionen
+        loadBadges: async function() {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) {
+                    this.createDemoBadges();
+                    return;
+                }
+                
+                const { data: badges, error } = await supabase
+                    .from('badges')
+                    .select('*')
+                    .order('display_name');
+                
+                if (error) {
+                    console.error('Fehler beim Laden der Badges:', error);
+                    this.createDemoBadges();
+                    return;
+                }
+                
+                this.allBadges = badges || [];
+                this.displayBadges();
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Badges:', error);
+                this.createDemoBadges();
+            }
+        },
+        
+        createDemoBadges: function() {
+            this.allBadges = [
+                { id: 1, name: 'premium', display_name: 'Premium', icon: '⭐', color_class: 'premium', description: 'Hat mehr als 100€ ausgegeben' },
+                { id: 2, name: 'verified', display_name: 'Verified', icon: '✅', color_class: 'verified', description: 'Verifizierter Account' },
+                { id: 3, name: 'admin', display_name: 'Admin', icon: '👑', color_class: 'admin', description: 'Administrator' },
+                { id: 4, name: 'developer', display_name: 'Developer', icon: '💻', color_class: 'developer', description: 'Entwickler' },
+                { id: 5, name: 'supporter', display_name: 'Early Supporter', icon: '🎗️', color_class: 'supporter', description: 'Seit 2024 dabei' },
+                { id: 6, name: 'booster', display_name: 'Booster', icon: '🚀', color_class: 'booster', description: 'Mehr als 10 Bestellungen' }
+            ];
+            this.displayBadges();
+        },
+        
+        displayBadges: function() {
+            const badgesListElement = document.getElementById('badgesList');
+            
+            if (!this.allBadges || this.allBadges.length === 0) {
+                badgesListElement.innerHTML = '<div class="empty-state">Keine Badges gefunden</div>';
+                return;
+            }
+            
+            let badgesHTML = '';
+            
+            this.allBadges.forEach(badge => {
+                badgesHTML += `
+                    <div class="product-card">
+                        <div class="product-header">
+                            <h3 class="product-name">
+                                <span style="font-size: 24px; margin-right: 8px;">${badge.icon}</span>
+                                ${badge.display_name}
+                            </h3>
+                            <div class="product-price">${badge.name}</div>
+                        </div>
+                        <div class="product-description">${badge.description || 'Keine Beschreibung'}</div>
+                        <div class="product-meta">
+                            <span>ID: ${badge.id}</span>
+                            <span>Class: ${badge.color_class || badge.name}</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn edit-btn" onclick="AdminJS.editBadge(${badge.id})">
+                                ✏️ Bearbeiten
+                            </button>
+                            <button class="action-btn delete-btn" onclick="AdminJS.deleteBadge(${badge.id})">
+                                🗑️ Löschen
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            badgesListElement.innerHTML = badgesHTML;
+        },
+        
+        openBadgeModal: async function(username) {
+            this.selectedUserId = username;
+            document.getElementById('badgeUser').value = username;
+            document.getElementById('badgeModalTitle').textContent = `Badges für ${username}`;
+            
+            await this.loadUserBadgesForModal(username);
+            await this.loadAvailableBadgesForModal();
+            
+            document.getElementById('badgeModal').style.display = 'block';
+        },
+        
+        loadUserBadgesForModal: async function(username) {
+            const userBadges = await this.getUserBadges(username);
+            const container = document.getElementById('currentUserBadges');
+            
+            if (!userBadges || userBadges.length === 0) {
+                container.innerHTML = '<div style="color: #aaa;">Keine Badges</div>';
+                return;
+            }
+            
+            let html = '';
+            userBadges.forEach(badge => {
+                html += `
+                    <div class="current-badge">
+                        <span class="current-badge-icon">${badge.icon}</span>
+                        <span class="current-badge-name">${badge.display_name}</span>
+                        <button class="remove-current-badge" onclick="AdminJS.removeBadgeFromUser('${username}', ${badge.id})">×</button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        },
+        
+        loadAvailableBadgesForModal: async function() {
+            const selector = document.getElementById('badgeSelector');
+            
+            if (!this.allBadges || this.allBadges.length === 0) {
+                selector.innerHTML = '<div style="color: #aaa;">Keine Badges verfügbar</div>';
+                return;
+            }
+            
+            let html = '';
+            this.allBadges.forEach(badge => {
+                html += `
+                    <div class="badge-option" onclick="AdminJS.addBadgeToUser('${this.selectedUserId}', ${badge.id})">
+                        <span class="badge-option-icon">${badge.icon}</span>
+                        <span class="badge-option-name">${badge.display_name}</span>
+                    </div>
+                `;
+            });
+            
+            selector.innerHTML = html;
+        },
+        
+        filterBadges: function() {
+            const filter = document.getElementById('badgeFilter').value.toLowerCase();
+            const options = document.querySelectorAll('.badge-option');
+            
+            options.forEach(opt => {
+                const name = opt.querySelector('.badge-option-name').textContent.toLowerCase();
+                if (name.includes(filter)) {
+                    opt.style.display = 'flex';
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+        },
+        
+        addBadgeToUser: async function(username, badgeId) {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('user_badges')
+                    .insert([{
+                        username: username,
+                        badge_id: badgeId,
+                        awarded_at: new Date().toISOString(),
+                        awarded_by: this.currentUser.username
+                    }]);
+                
+                if (error) {
+                    if (error.code === '23505') {
+                        this.showAlert('Badge bereits vorhanden!', 'error');
+                    } else {
+                        this.showAlert('Fehler beim Hinzufügen: ' + error.message, 'error');
+                    }
+                    return;
+                }
+                
+                this.showAlert('Badge hinzugefügt!', 'success');
+                await this.loadUserBadgesForModal(username);
+                await this.loadUsers();
+                
+            } catch (error) {
+                console.error('Fehler beim Hinzufügen des Badges:', error);
+            }
+        },
+        
+        removeBadgeFromUser: async function(username, badgeId) {
+            if (!confirm('Badge wirklich entfernen?')) return;
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('user_badges')
+                    .delete()
+                    .eq('username', username)
+                    .eq('badge_id', badgeId);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Entfernen: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert('Badge entfernt!', 'success');
+                await this.loadUserBadgesForModal(username);
+                await this.loadUsers();
+                
+            } catch (error) {
+                console.error('Fehler beim Entfernen des Badges:', error);
+            }
+        },
+        
+        closeBadgeModal: function() {
+            document.getElementById('badgeModal').style.display = 'none';
+            this.selectedUserId = null;
+        },
+        
+        editBadge: function(badgeId) {
+            const badge = this.allBadges.find(b => b.id === badgeId);
+            if (badge) {
+                alert(`Badge bearbeiten: ${badge.display_name}\nDiese Funktion kommt bald!`);
+            }
+        },
+        
+        deleteBadge: async function(badgeId) {
+            if (!confirm('Badge wirklich löschen? Alle Zuweisungen werden ebenfalls gelöscht.')) return;
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('badges')
+                    .delete()
+                    .eq('id', badgeId);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Löschen: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert('Badge gelöscht!', 'success');
+                await this.loadBadges();
+                
+            } catch (error) {
+                console.error('Fehler beim Löschen des Badges:', error);
+            }
+        },
+        
+        searchBadges: function() {
+            const searchTerm = document.getElementById('badgeSearch').value.toLowerCase();
+            const filteredBadges = this.allBadges.filter(badge => 
+                badge.display_name.toLowerCase().includes(searchTerm) ||
+                badge.name.toLowerCase().includes(searchTerm) ||
+                (badge.description && badge.description.toLowerCase().includes(searchTerm))
+            );
+            
+            const badgesListElement = document.getElementById('badgesList');
+            
+            if (!filteredBadges || filteredBadges.length === 0) {
+                badgesListElement.innerHTML = '<div class="empty-state">Keine passenden Badges gefunden</div>';
+                return;
+            }
+            
+            let badgesHTML = '';
+            
+            filteredBadges.forEach(badge => {
+                badgesHTML += `
+                    <div class="product-card">
+                        <div class="product-header">
+                            <h3 class="product-name">
+                                <span style="font-size: 24px; margin-right: 8px;">${badge.icon}</span>
+                                ${badge.display_name}
+                            </h3>
+                            <div class="product-price">${badge.name}</div>
+                        </div>
+                        <div class="product-description">${badge.description || 'Keine Beschreibung'}</div>
+                        <div class="product-meta">
+                            <span>ID: ${badge.id}</span>
+                            <span>Class: ${badge.color_class || badge.name}</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn edit-btn" onclick="AdminJS.editBadge(${badge.id})">
+                                ✏️ Bearbeiten
+                            </button>
+                            <button class="action-btn delete-btn" onclick="AdminJS.deleteBadge(${badge.id})">
+                                🗑️ Löschen
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            badgesListElement.innerHTML = badgesHTML;
+        },
+        
+        switchTab: function(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        },
+        
+        searchOrders: function() {
+            const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
+            const filteredOrders = this.allOrders.filter(order => 
+                order.user_id.toLowerCase().includes(searchTerm) ||
+                (order.user_email && order.user_email.toLowerCase().includes(searchTerm)) ||
+                order.id.toString().includes(searchTerm)
+            );
+            this.displayOrders(filteredOrders);
+        },
+        
+        searchUsers: function() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const filteredUsers = this.allUsers.filter(user => 
+                user.username.toLowerCase().includes(searchTerm) ||
+                (user.email && user.email.toLowerCase().includes(searchTerm))
+            );
+            this.displayFilteredUsers(filteredUsers);
+        },
+        
+        displayFilteredUsers: async function(filteredUsers) {
+            const usersListElement = document.getElementById('usersList');
+            
+            if (!filteredUsers || filteredUsers.length === 0) {
+                usersListElement.innerHTML = '<div class="empty-state">Keine passenden Benutzer gefunden</div>';
+                return;
+            }
+            
+            let usersHTML = '';
+            
+            for (const user of filteredUsers) {
+                const userBalance = await this.getUserBalanceFromDB(user.username);
+                const userCoins = await this.getUserCoinsFromDB(user.username);
+                const isAdmin = await this.checkIfUserIsAdmin(user.username);
+                const userBadges = await this.getUserBadges(user.username);
+                
+                let badgesHTML = '';
+                if (userBadges && userBadges.length > 0) {
+                    badgesHTML = '<div class="user-badges">';
+                    userBadges.forEach(badge => {
+                        if (badge.name === 'verified') {
+                            badgesHTML += `<img src="img/verified.ico" class="badge-icon" title="${badge.display_name}" alt="Verified">`;
+                        } else {
+                            badgesHTML += `<span class="badge-tag badge-${badge.color_class || badge.name}">${badge.icon} ${badge.display_name}</span>`;
+                        }
+                    });
+                    badgesHTML += '</div>';
+                }
+                
+                usersHTML += `
+                    <div class="user-row">
+                        <div class="user-info">
+                            <h4>
+                                ${user.username} ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
+                                ${badgesHTML}
+                            </h4>
+                            <p>${user.email || 'Keine Email'} | Registriert: ${user.created_at ? new Date(user.created_at).toLocaleDateString('de-DE') : 'Unbekannt'}</p>
+                        </div>
+                        <div class="user-balance-container">
+                            <div class="user-balance">
+                                ${this.formatEuro(userBalance)}
+                            </div>
+                            <div class="user-coins">
+                                ${userCoins} Coins
+                            </div>
+                        </div>
+                        <div class="admin-actions">
+                            <button class="update-balance-btn" onclick="AdminJS.openBalanceModal('${user.username}', ${userBalance}, ${userCoins})">
+                                💰 Bearbeiten
+                            </button>
+                            <button class="add-badge-btn" onclick="AdminJS.openBadgeModal('${user.username}')">
+                                🏆 Badges
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            usersListElement.innerHTML = usersHTML;
+        },
+        
+        showAlert: function(message, type) {
+            const alertElement = document.getElementById('adminAlert');
+            alertElement.textContent = message;
+            alertElement.className = `admin-alert alert-${type}`;
+            alertElement.style.display = 'block';
+            
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+            }, 5000);
+        },
+        
+        loadProducts: async function() {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { data: products, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Fehler beim Laden der Produkte:', error);
+                    return;
+                }
+                
+                this.allProducts = products || [];
+                this.displayProducts();
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Produkte:', error);
+            }
+        },
+        
+        displayProducts: function() {
+            const productsListElement = document.getElementById('productsList');
+            
+            if (!this.allProducts || this.allProducts.length === 0) {
+                productsListElement.innerHTML = '<div class="empty-state">Keine Produkte gefunden</div>';
+                return;
+            }
+            
+            let productsHTML = '';
+            
+            this.allProducts.forEach(product => {
+                productsHTML += `
+                    <div class="product-card">
+                        <div class="product-header">
+                            <h3 class="product-name">${product.name}</h3>
+                            <div class="product-price">€${parseFloat(product.price).toFixed(2)}</div>
+                        </div>
+                        <div class="product-description">${product.description}</div>
+                        <div class="product-meta">
+                            <span>Kategorie: ${product.category}</span>
+                            <span>ID: ${product.id}</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn edit-btn" onclick="AdminJS.editProduct(${product.id})">
+                                ✏️ Bearbeiten
+                            </button>
+                            <button class="action-btn delete-btn" onclick="AdminJS.deleteProduct(${product.id})">
+                                🗑️ Löschen
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            productsListElement.innerHTML = productsHTML;
+        },
+        
+        openProductModal: function(product = null) {
+            this.editingProductId = product ? product.id : null;
+            
+            if (product) {
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productDescription').value = product.description;
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productCategory').value = product.category;
+                document.getElementById('productImage').value = product.image_url || '';
+                document.getElementById('productModalTitle').textContent = 'Produkt bearbeiten';
+            } else {
+                document.getElementById('productName').value = '';
+                document.getElementById('productDescription').value = '';
+                document.getElementById('productPrice').value = '';
+                document.getElementById('productCategory').value = 'booster';
+                document.getElementById('productImage').value = '';
+                document.getElementById('productModalTitle').textContent = 'Neues Produkt';
+            }
+            
+            document.getElementById('productModal').style.display = 'block';
+        },
+        
+        closeProductModal: function() {
+            document.getElementById('productModal').style.display = 'none';
+            this.editingProductId = null;
+        },
+        
+        saveProduct: async function() {
+            const name = document.getElementById('productName').value;
+            const description = document.getElementById('productDescription').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const category = document.getElementById('productCategory').value;
+            const image_url = document.getElementById('productImage').value;
+            
+            if (!name || !description || !price) {
+                this.showAlert('Bitte fülle alle Pflichtfelder aus!', 'error');
+                return;
+            }
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                let result;
+                
+                if (this.editingProductId) {
+                    result = await supabase
+                        .from('products')
+                        .update({
+                            name: name,
+                            description: description,
+                            price: price,
+                            category: category,
+                            image_url: image_url,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', this.editingProductId);
+                } else {
+                    result = await supabase
+                        .from('products')
+                        .insert([{
+                            name: name,
+                            description: description,
+                            price: price,
+                            category: category,
+                            image_url: image_url,
+                            created_at: new Date().toISOString()
+                        }]);
+                }
+                
+                if (result.error) {
+                    this.showAlert('Fehler beim Speichern: ' + result.error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert(`Produkt ${this.editingProductId ? 'aktualisiert' : 'erstellt'}!`, 'success');
+                this.closeProductModal();
+                await this.loadProducts();
+                
+            } catch (error) {
+                console.error('Fehler beim Speichern des Produkts:', error);
+            }
+        },
+        
+        editProduct: function(productId) {
+            const product = this.allProducts.find(p => p.id === productId);
+            if (product) {
+                this.openProductModal(product);
+            }
+        },
+        
+        deleteProduct: async function(productId) {
+            if (!confirm('Produkt wirklich löschen?')) return;
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('products')
+                    .delete()
+                    .eq('id', productId);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Löschen: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert('Produkt gelöscht!', 'success');
+                await this.loadProducts();
+                
+            } catch (error) {
+                console.error('Fehler beim Löschen des Produkts:', error);
+            }
+        },
+        
+        searchProducts: function() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+            const filteredProducts = this.allProducts.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) ||
+                product.description.toLowerCase().includes(searchTerm) ||
+                product.category.toLowerCase().includes(searchTerm)
+            );
+            
+            const productsListElement = document.getElementById('productsList');
+            
+            if (!filteredProducts || filteredProducts.length === 0) {
+                productsListElement.innerHTML = '<div class="empty-state">Keine passenden Produkte gefunden</div>';
+                return;
+            }
+            
+            let productsHTML = '';
+            
+            filteredProducts.forEach(product => {
+                productsHTML += `
+                    <div class="product-card">
+                        <div class="product-header">
+                            <h3 class="product-name">${product.name}</h3>
+                            <div class="product-price">€${parseFloat(product.price).toFixed(2)}</div>
+                        </div>
+                        <div class="product-description">${product.description}</div>
+                        <div class="product-meta">
+                            <span>Kategorie: ${product.category}</span>
+                            <span>ID: ${product.id}</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn edit-btn" onclick="AdminJS.editProduct(${product.id})">
+                                ✏️ Bearbeiten
+                            </button>
+                            <button class="action-btn delete-btn" onclick="AdminJS.deleteProduct(${product.id})">
+                                🗑️ Löschen
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            productsListElement.innerHTML = productsHTML;
+        },
+        
+        loadAdmins: async function() {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { data: admins, error } = await supabase
+                    .from('admins')
+                    .select('*')
+                    .order('username');
+                
+                if (error) {
+                    console.log('Admins Tabelle nicht verfügbar:', error.message);
+                    return;
+                }
+                
+                this.allAdmins = admins || [];
+                this.displayAdmins();
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Admins:', error);
+            }
+        },
+        
+        displayAdmins: async function() {
+            const adminsListElement = document.getElementById('adminsList');
+            
+            let adminsHTML = '';
+            
+            for (const user of this.allUsers) {
+                const isAdmin = await this.checkIfUserIsAdmin(user.username);
+                
+                adminsHTML += `
+                    <div class="user-row">
+                        <div class="user-info">
+                            <h4>${user.username}</h4>
+                            <p>${user.email || 'Keine Email'}</p>
+                        </div>
+                        <div class="admin-actions">
+                            ${isAdmin ? `
+                                <button class="remove-admin-btn" onclick="AdminJS.removeAdmin('${user.username}')">
+                                    🔓 Admin entfernen
+                                </button>
+                            ` : `
+                                <button class="make-admin-btn" onclick="AdminJS.makeAdmin('${user.username}')">
+                                    🔐 Zum Admin machen
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            adminsListElement.innerHTML = adminsHTML || '<div class="empty-state">Keine Benutzer gefunden</div>';
+        },
+        
+        makeAdmin: async function(username) {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('admins')
+                    .insert([{
+                        username: username,
+                        created_at: new Date().toISOString()
+                    }]);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Erstellen des Admins: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert(`${username} ist jetzt ein Admin!`, 'success');
+                await this.loadAdmins();
+                await this.loadUsers();
+                
+            } catch (error) {
+                console.error('Fehler beim Erstellen des Admins:', error);
+            }
+        },
+        
+        removeAdmin: async function(username) {
+            if (!confirm(`Admin-Berechtigung für ${username} wirklich entfernen?`)) return;
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('admins')
+                    .delete()
+                    .eq('username', username);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Entfernen: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert(`Admin-Berechtigung für ${username} entfernt!`, 'success');
+                await this.loadAdmins();
+                await this.loadUsers();
+                
+            } catch (error) {
+                console.error('Fehler beim Entfernen des Admins:', error);
+            }
+        },
+        
+        searchAdmins: function() {
+            const searchTerm = document.getElementById('adminSearch').value.toLowerCase();
+            const filteredUsers = this.allUsers.filter(user => 
+                user.username.toLowerCase().includes(searchTerm) ||
+                (user.email && user.email.toLowerCase().includes(searchTerm))
+            );
+            this.displayFilteredAdmins(filteredUsers);
+        },
+        
+        displayFilteredAdmins: async function(filteredUsers) {
+            const adminsListElement = document.getElementById('adminsList');
+            
+            let adminsHTML = '';
+            
+            for (const user of filteredUsers) {
+                const isAdmin = await this.checkIfUserIsAdmin(user.username);
+                
+                adminsHTML += `
+                    <div class="user-row">
+                        <div class="user-info">
+                            <h4>${user.username}</h4>
+                            <p>${user.email || 'Keine Email'}</p>
+                        </div>
+                        <div class="admin-actions">
+                            ${isAdmin ? `
+                                <button class="remove-admin-btn" onclick="AdminJS.removeAdmin('${user.username}')">
+                                    🔓 Admin entfernen
+                                </button>
+                            ` : `
+                                <button class="make-admin-btn" onclick="AdminJS.makeAdmin('${user.username}')">
+                                    🔐 Zum Admin machen
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            adminsListElement.innerHTML = adminsHTML || '<div class="empty-state">Keine passenden Benutzer gefunden</div>';
+        },
+        
+        loadEmployeeOfMonth: async function() {
+            try {
+                const savedEmployee = localStorage.getItem('employee_of_month');
+                if (savedEmployee) {
+                    document.getElementById('currentEmployeeName').textContent = savedEmployee;
+                    return;
+                }
+                
+                document.getElementById('currentEmployeeName').textContent = 'Noch nicht gewählt';
+                
+            } catch (error) {
+                console.error('Fehler beim Laden des Mitarbeiters des Monats:', error);
+                document.getElementById('currentEmployeeName').textContent = 'Noch nicht gewählt';
+            }
+        },
+        
+        setupEmployeeGrid: function() {
+            const employeeGrid = document.getElementById('employeeGrid');
+            employeeGrid.innerHTML = '';
+            
+            this.teamMembers.forEach(member => {
+                const employeeOption = document.createElement('div');
+                employeeOption.className = 'employee-option';
+                employeeOption.setAttribute('data-name', member);
+                employeeOption.innerHTML = `
+                    <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px;">${member}</div>
+                    <div style="font-size: 12px; color: #aaa;">Klicken zum Auswählen</div>
+                `;
+                
+                employeeOption.addEventListener('click', () => {
+                    document.querySelectorAll('.employee-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    this.selectedEmployee = member;
+                    employeeOption.classList.add('selected');
+                    console.log('Mitarbeiter ausgewählt:', this.selectedEmployee);
+                });
+                
+                employeeGrid.appendChild(employeeOption);
+            });
+        },
+        
+        saveEmployeeOfMonth: async function() {
+            if (!this.selectedEmployee) {
+                this.showAlert('Bitte wähle zuerst einen Mitarbeiter aus!', 'error');
+                return;
+            }
+            
+            try {
+                localStorage.setItem('employee_of_month', this.selectedEmployee);
+                document.getElementById('currentEmployeeName').textContent = this.selectedEmployee;
+                this.showAlert(`✅ "${this.selectedEmployee}" wurde als Mitarbeiter des Monats gespeichert!`, 'success');
+                
+            } catch (error) {
+                console.error('Fehler beim Speichern des Mitarbeiters des Monats:', error);
+                this.showAlert('❌ Fehler beim Speichern!', 'error');
+            }
+        },
+        
+        clearEmployeeOfMonth: function() {
+            if (!confirm('Möchtest du den Mitarbeiter des Monats wirklich zurücksetzen?')) return;
+            
+            localStorage.removeItem('employee_of_month');
+            document.getElementById('currentEmployeeName').textContent = 'Noch nicht gewählt';
+            
+            document.querySelectorAll('.employee-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            this.selectedEmployee = null;
+            
+            this.showAlert('✅ Mitarbeiter des Monats wurde zurückgesetzt!', 'success');
+        },
+        
+        loadEvents: async function() {
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { data: events, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Fehler beim Laden der Events:', error);
+                    return;
+                }
+                
+                this.allEvents = events || [];
+                this.displayEvents();
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Events:', error);
+            }
+        },
+        
+        displayEvents: function() {
+            const currentActiveEvent = document.getElementById('currentActiveEvent');
+            const pastEventsList = document.getElementById('pastEventsList');
+            
+            const now = new Date();
+            const activeEvent = this.allEvents.find(event => 
+                event.is_active && new Date(event.end_time) > now
+            );
+            
+            if (activeEvent) {
+                currentActiveEvent.innerHTML = `
+                    <div style="background: rgba(255, 71, 87, 0.1); border: 2px solid #ff4757; border-radius: 10px; padding: 20px;">
+                        <h4 style="color: #ff4757; margin: 0 0 10px 0;">🔴 ${activeEvent.title}</h4>
+                        <p style="color: white; margin: 0 0 10px 0;">${activeEvent.description || 'Keine Beschreibung'}</p>
+                        <div style="color: #aaa; font-size: 14px;">
+                            <div>Start: ${new Date(activeEvent.start_time).toLocaleString('de-DE')}</div>
+                            <div>Ende: ${new Date(activeEvent.end_time).toLocaleString('de-DE')}</div>
+                            <div>Erstellt von: ${activeEvent.created_by}</div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="action-btn delete-btn" onclick="AdminJS.endEvent(${activeEvent.id})">
+                                🔴 Event beenden
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                currentActiveEvent.innerHTML = '<div class="empty-state">Kein aktives Event</div>';
+            }
+            
+            const pastEvents = this.allEvents.filter(event => 
+                !event.is_active || new Date(event.end_time) <= now
+            );
+            
+            if (pastEvents.length === 0) {
+                pastEventsList.innerHTML = '<div class="empty-state">Keine vergangenen Events</div>';
+                return;
+            }
+            
+            let pastEventsHTML = '';
+            pastEvents.forEach(event => {
+                const isExpired = new Date(event.end_time) <= now;
+                pastEventsHTML += `
+                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 15px; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h5 style="color: white; margin: 0 0 5px 0;">${event.title}</h5>
+                                <p style="color: #aaa; margin: 0 0 5px 0; font-size: 14px;">${event.description || 'Keine Beschreibung'}</p>
+                                <div style="color: #888; font-size: 12px;">
+                                    <div>Start: ${new Date(event.start_time).toLocaleString('de-DE')}</div>
+                                    <div>Ende: ${new Date(event.end_time).toLocaleString('de-DE')}</div>
+                                    <div>Erstellt von: ${event.created_by}</div>
+                                    <div>Status: ${isExpired ? 'Beendet' : 'Inaktiv'}</div>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="action-btn delete-btn" onclick="AdminJS.deleteEvent(${event.id})" style="margin-left: 10px;">
+                                    🗑️ Löschen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            pastEventsList.innerHTML = pastEventsHTML;
+        },
+        
+        openEventModal: function(event = null) {
+            this.editingEventId = event ? event.id : null;
+            
+            const now = new Date();
+            const defaultStart = new Date(now.getTime() + 5 * 60000);
+            const defaultEnd = new Date(now.getTime() + 2 * 60 * 60000);
+            
+            if (event) {
+                document.getElementById('eventTitle').value = event.title;
+                document.getElementById('eventDescription').value = event.description || '';
+                document.getElementById('eventStartTime').value = event.start_time.slice(0, 16);
+                document.getElementById('eventEndTime').value = event.end_time.slice(0, 16);
+                document.getElementById('eventModalTitle').textContent = 'Event bearbeiten';
+            } else {
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventDescription').value = '';
+                document.getElementById('eventStartTime').value = defaultStart.toISOString().slice(0, 16);
+                document.getElementById('eventEndTime').value = defaultEnd.toISOString().slice(0, 16);
+                document.getElementById('eventModalTitle').textContent = 'Neues Live Event';
+            }
+            
+            document.getElementById('eventModal').style.display = 'block';
+        },
+        
+        closeEventModal: function() {
+            document.getElementById('eventModal').style.display = 'none';
+            this.editingEventId = null;
+        },
+        
+        saveEvent: async function() {
+            const title = document.getElementById('eventTitle').value;
+            const description = document.getElementById('eventDescription').value;
+            const startTime = document.getElementById('eventStartTime').value;
+            const endTime = document.getElementById('eventEndTime').value;
+            
+            if (!title || !startTime || !endTime) {
+                this.showAlert('Bitte fülle alle Pflichtfelder aus!', 'error');
+                return;
+            }
+            
+            if (new Date(startTime) >= new Date(endTime)) {
+                this.showAlert('Endzeit muss nach der Startzeit liegen!', 'error');
+                return;
+            }
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                let result;
+                
+                if (this.editingEventId) {
+                    result = await supabase
+                        .from('events')
+                        .update({
+                            title: title,
+                            description: description,
+                            start_time: startTime + ':00Z',
+                            end_time: endTime + ':00Z',
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', this.editingEventId);
+                } else {
+                    result = await supabase
+                        .from('events')
+                        .insert([{
+                            title: title,
+                            description: description,
+                            start_time: startTime + ':00Z',
+                            end_time: endTime + ':00Z',
+                            is_active: true,
+                            created_by: this.currentUser.username,
+                            created_at: new Date().toISOString()
+                        }]);
+                }
+                
+                if (result.error) {
+                    this.showAlert('Fehler beim Speichern: ' + result.error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert(`Event ${this.editingEventId ? 'aktualisiert' : 'gestartet'}!`, 'success');
+                this.closeEventModal();
+                await this.loadEvents();
+                
+            } catch (error) {
+                console.error('Fehler beim Speichern des Events:', error);
+            }
+        },
+        
+        endEvent: async function(eventId) {
+            if (!confirm('Event wirklich beenden?')) return;
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('events')
+                    .update({
+                        is_active: false,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', eventId);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Beenden: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert('Event beendet!', 'success');
+                await this.loadEvents();
+                
+            } catch (error) {
+                console.error('Fehler beim Beenden des Events:', error);
+            }
+        },
+        
+        deleteEvent: async function(eventId) {
+            if (!confirm('Event wirklich löschen?')) return;
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) return;
+                
+                const { error } = await supabase
+                    .from('events')
+                    .delete()
+                    .eq('id', eventId);
+                
+                if (error) {
+                    this.showAlert('Fehler beim Löschen: ' + error.message, 'error');
+                    return;
+                }
+                
+                this.showAlert('Event gelöscht!', 'success');
+                await this.loadEvents();
+                
+            } catch (error) {
+                console.error('Fehler beim Löschen des Events:', error);
+            }
+        },
+        
+        testPermissions: async function() {
+            console.log('Teste Berechtigungen...');
+            this.showAlert('Teste Berechtigungen...', 'error');
+            
+            let results = [];
+            
+            try {
+                const supabase = this.getSupabaseClient();
+                if (!supabase) {
+                    results.push('❌ Supabase Client nicht verfügbar');
+                } else {
+                    results.push('✅ Supabase Client: OK');
+                    
+                    const { error: selectError } = await supabase
+                        .from('orders')
+                        .select('*')
+                        .limit(1);
+                    
+                    if (selectError) {
+                        results.push(`❌ SELECT: ${selectError.message}`);
+                    } else {
+                        results.push('✅ SELECT: OK');
+                    }
+                }
+            } catch (error) {
+                results.push(`❌ Fehler: ${error.message}`);
+            }
+            
+            const resultText = results.join('\n');
+            console.log('Berechtigungstest Ergebnisse:', results);
+            
+            if (resultText.includes('❌')) {
+                this.showSqlHelp();
+            }
+            
+            alert('Berechtigungstest Ergebnisse:\n\n' + resultText);
+            document.getElementById('debugContent').textContent = resultText;
+            document.getElementById('debugInfo').style.display = 'block';
+        },
+        
+        showSqlHelp: function() {
+            const sqlCommands = `
+-- RLS für orders Tabelle deaktivieren
+ALTER TABLE orders DISABLE ROW LEVEL SECURITY;
+
+-- Badges Tabelle
+CREATE TABLE IF NOT EXISTS badges (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL,
+    display_name TEXT NOT NULL,
+    description TEXT,
+    icon TEXT NOT NULL,
+    color_class TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- User-Badges Tabelle
+CREATE TABLE IF NOT EXISTS user_badges (
+    id BIGSERIAL PRIMARY KEY,
+    username TEXT NOT NULL REFERENCES users(username) ON DELETE CASCADE,
+    badge_id INTEGER NOT NULL REFERENCES badges(id) ON DELETE CASCADE,
+    awarded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    awarded_by TEXT,
+    UNIQUE(username, badge_id)
+);
+
+-- Beispiel-Badges einfügen
+INSERT INTO badges (name, display_name, description, icon, color_class) VALUES
+('premium', 'Premium', 'Hat mehr als 100€ ausgegeben', '⭐', 'premium'),
+('verified', 'Verified', 'Verifizierter Account', '✅', 'verified'),
+('admin', 'Admin', 'Administrator', '👑', 'admin'),
+('developer', 'Developer', 'Entwickler', '💻', 'developer'),
+('supporter', 'Early Supporter', 'Seit 2024 dabei', '🎗️', 'supporter'),
+('booster', 'Booster', 'Mehr als 10 Bestellungen', '🚀', 'booster')
+ON CONFLICT (name) DO NOTHING;
+            `;
+            
+            document.getElementById('sqlCommands').textContent = sqlCommands;
+            document.getElementById('sqlHelp').style.display = 'block';
+        },
+        
+        fixDatabaseSchema: function() {
+            this.showSqlHelp();
+            this.showAlert('SQL-Befehle zum Reparieren des Schemas wurden angezeigt. Bitte in Supabase ausführen!', 'error');
+        },
+        
+        showDebugInfo: function() {
+            const debugContent = document.getElementById('debugContent');
+            const debugInfo = `
+Aktueller Benutzer: ${this.currentUser ? this.currentUser.username : 'Nicht eingeloggt'}
+Supabase Client: ${this.supabase ? 'Verfügbar' : 'Nicht verfügbar'}
+Anzahl Bestellungen: ${this.allOrders.length}
+Anzahl Benutzer: ${this.allUsers.length}
+Anzahl Produkte: ${this.allProducts.length}
+Anzahl Badges: ${this.allBadges.length}
+Anzahl Admins: ${this.allAdmins.length}
+Anzahl Events: ${this.allEvents.length}
+Mitarbeiter des Monats: ${localStorage.getItem('employee_of_month') || 'Nicht gesetzt'}
+            `;
+            debugContent.textContent = debugInfo;
+            document.getElementById('debugInfo').style.display = 'block';
+        }
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Shop Admin Seite geladen');
+        AdminJS.init();
+    });
+    </script>
+</body>
+</html>

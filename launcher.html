@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buff Studio Launcher Download</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #000000 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+        }
+        
+        .logo img {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            color: #b0b0b0;
+            margin-bottom: 40px;
+        }
+        
+        .download-card {
+            background: rgba(26, 26, 26, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .version {
+            color: #4ade80;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+        }
+        
+        .feature h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .feature p {
+            color: #b0b0b0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .download-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+            justify-content: center;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .download-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .download-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .install-steps {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .install-steps h3 {
+            color: #fbbf24;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .steps {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .steps li {
+            color: #b0b0b0;
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .steps li:before {
+            content: counter(step);
+            counter-increment: step;
+            background: #667eea;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        .requirements {
+            text-align: left;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .requirements h3 {
+            color: #fbbf24;
+            margin-bottom: 15px;
+        }
+        
+        .requirements ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .requirements li {
+            color: #b0b0b0;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .requirements li:before {
+            content: "✓";
+            color: #4ade80;
+            position: absolute;
+            left: -20px;
+        }
+        
+        .copyright {
+            margin-top: 40px;
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .download-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #93c5fd;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+            
+            .download-card {
+                padding: 20px;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .download-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            padding: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .progress-text {
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://buffstudio.netlify.app/img/logo.png" alt="Buff Studio Logo">
+        </div>
+        
+        <h1>Buff Studio Launcher</h1>
+        <p class="subtitle">Der offizielle Launcher für alle Buff Studio Spiele</p>
+        
+        <div class="download-card">
+            <div class="version">Version 2.0.0 • Windows • Standalone EXE • 45 MB</div>
+            
+            <div class="features">
+                <div class="feature">
+                    <h3>🎮 Spiele verwalten</h3>
+                    <p>Installiere und starte alle Buff Studio Spiele von einem Ort aus</p>
+                </div>
+                <div class="feature">
+                    <h3>⭐ XP System</h3>
+                    <p>Verdiene XP durch Käufe und steige im Level auf</p>
+                </div>
+                <div class="feature">
+                    <h3>🛒 Integrierter Shop</h3>
+                    <p>Kaufe Items direkt im Launcher</p>
+                </div>
+                <div class="feature">
+                    <h3>👥 Freundesliste & Chat</h3>
+                    <p>Chatte mit Freunden und sehe wer online ist</p>
+                </div>
+            </div>
+            
+            <div class="download-info">
+                <strong>📥 Direkter Download:</strong> Dies ist eine standalone EXE-Datei. Keine Installation von Python oder anderen Abhängigkeiten nötig!
+            </div>
+            
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Download wird vorbereitet...</div>
+            </div>
+            
+            <div class="download-buttons">
+                <button class="download-btn" onclick="startDownload()" id="downloadButton">
+                    ⬇️ Jetzt herunterladen (45 MB)
+                </button>
+                <a href="https://buffstudio.netlify.app" class="download-btn secondary">
+                    🌐 Zurück zur Website
+                </a>
+            </div>
+        </div>
+        
+        <div class="install-steps">
+            <h3>📋 Einfache Installation in 2 Schritten:</h3>
+            <ol class="steps">
+                <li><strong>Herunterladen:</strong> Klicke auf "Jetzt herunterladen" und speichere die Datei</li>
+                <li><strong>Starten:</strong> Öffne die Datei <code>BuffStudioLauncher.exe</code> - fertig!</li>
+            </ol>
+            <p style="color: #4ade80; margin-top: 10px; font-size: 14px;">
+                ✅ Keine Installation nötig - direkt startbereit!
+            </p>
+        </div>
+        
+        <div class="requirements">
+            <h3>Systemvoraussetzungen</h3>
+            <ul>
+                <li>Windows 10 oder höher (64-bit empfohlen)</li>
+                <li>4 GB RAM (8 GB empfohlen)</li>
+                <li>500 MB freier Speicherplatz</li>
+                <li>Internetverbindung für Online-Features</li>
+                <li>DirectX 11 oder höher</li>
+            </ul>
+        </div>
+        
+        <div class="copyright">
+            © 2024 Buff Studio. Alle Rechte vorbehalten.<br>
+            buffstudio.netlify.app • <a href="https://buffstudio.netlify.app/archives/" style="color: #667eea;">Archives</a>
+        </div>
+    </div>
+    
+    <script>
+        // Direkter Download-Link zu deiner EXE
+        const downloadUrl = 'https://buffstudio.netlify.app/archives/BuffStudioLauncher.exe';
+        const filename = 'BuffStudioLauncher.exe';
+        const fileSizeMB = 45; // Dateigröße in MB
+        
+        // DOM Elemente
+        const downloadButton = document.getElementById('downloadButton');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        
+        // Download-Fortschritt anzeigen
+        function showProgress() {
+            progressContainer.style.display = 'block';
+            downloadButton.disabled = true;
+            downloadButton.innerHTML = '⬇️ Lade herunter...';
+        }
+        
+        // Download-Fortschritt aktualisieren
+        function updateProgress(loaded, total) {
+            const percent = Math.round((loaded / total) * 100);
+            progressFill.style.width = percent + '%';
+            
+            const loadedMB = (loaded / (1024 * 1024)).toFixed(1);
+            const totalMB = (total / (1024 * 1024)).toFixed(1);
+            
+            progressText.textContent = `Download: ${loadedMB} MB / ${totalMB} MB (${percent}%)`;
+            
+            if (percent === 100) {
+                progressText.textContent = '✅ Download abgeschlossen! Datei wird gespeichert...';
+            }
+        }
+        
+        // Download mit Fortschrittsanzeige
+        function startDownload() {
+            showProgress();
+            
+            // Erstelle einen versteckten iframe für den Download
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = downloadUrl;
+            
+            // Füge dem body hinzu und trigger den Download
+            document.body.appendChild(iframe);
+            
+            // Simuliere Fortschritt (da wir den echten Fortschritt nicht messen können)
+            simulateProgress();
+            
+            // Nach 3 Sekunden Erfolgsmeldung anzeigen
+            setTimeout(() => {
+                progressFill.style.width = '100%';
+                progressText.textContent = '✅ Download abgeschlossen! Die Datei sollte jetzt gespeichert werden.';
+                
+                // Button zurücksetzen
+                downloadButton.disabled = false;
+                downloadButton.innerHTML = '✅ Erneut herunterladen';
+                
+                // Info anzeigen
+                alert('✅ Download erfolgreich!\n\nDie Datei "BuffStudioLauncher.exe" wurde heruntergeladen.\n\nSo starten Sie den Launcher:\n1. Öffnen Sie den Downloads-Ordner\n2. Doppelklicken Sie auf "BuffStudioLauncher.exe"\n3. Fertig! Der Launcher startet automatisch.');
+                
+                // Iframe entfernen
+                setTimeout(() => document.body.removeChild(iframe), 1000);
+            }, 3000);
+        }
+        
+        // Simuliere Download-Fortschritt
+        function simulateProgress() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (progress < 90) {
+                    progress += Math.random() * 15;
+                    updateProgress(
+                        (progress / 100) * fileSizeMB * 1024 * 1024,
+                        fileSizeMB * 1024 * 1024
+                    );
+                } else {
+                    clearInterval(interval);
+                }
+            }, 300);
+        }
+        
+        // Alternativer Download mit Fetch API (bessere Fehlerbehandlung)
+        async function downloadWithFetch() {
+            try {
+                showProgress();
+                
+                const response = await fetch(downloadUrl);
+                const contentLength = response.headers.get('content-length');
+                const total = contentLength ? parseInt(contentLength) : fileSizeMB * 1024 * 1024;
+                
+                const reader = response.body.getReader();
+                let receivedLength = 0;
+                const chunks = [];
+                
+                while(true) {
+                    const {done, value} = await reader.read();
+                    
+                    if (done) {
+                        break;
+                    }
+                    
+                    chunks.push(value);
+                    receivedLength += value.length;
+                    
+                    // Fortschritt aktualisieren
+                    updateProgress(receivedLength, total);
+                }
+                
+                // Datei erstellen und herunterladen
+                const blob = new Blob(chunks);
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Aufräumen
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                // Erfolgsmeldung
+                progressText.textContent = '✅ Download erfolgreich abgeschlossen!';
+                downloadButton.disabled = false;
+                downloadButton.innerHTML = '✅ Erneut herunterladen';
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                progressText.textContent = '❌ Download fehlgeschlagen. Bitte versuchen Sie es erneut.';
+                progressFill.style.background = '#ef4444';
+                downloadButton.disabled = false;
+                downloadButton.innerHTML = '🔄 Erneut versuchen';
+                
+                alert('❌ Download fehlgeschlagen!\n\nBitte stellen Sie sicher, dass:\n• Sie mit dem Internet verbunden sind\n• Die Datei verfügbar ist: ' + downloadUrl + '\n\nFalls das Problem besteht, kontaktieren Sie uns.');
+            }
+        }
+        
+        // Einfacher Download (ohne Fortschrittsanzeige)
+        function simpleDownload() {
+            // Erstelle temporären Link
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = filename;
+            
+            // Trigger Download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Info anzeigen
+            setTimeout(() => {
+                alert('✅ Der Download wurde gestartet!\n\nFalls der Download nicht automatisch startet:\n1. Rechtsklick auf den Button\n2. "Link speichern unter..." wählen\n3. "BuffStudioLauncher.exe" speichern');
+            }, 500);
+        }
+        
+        // Auto-check auf Mobile
+        window.onload = function() {
+            console.log('Buff Studio Launcher Download Page loaded');
+            console.log('Download URL:', downloadUrl);
+            
+            // Prüfe ob Mobile
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                alert('📱 Hinweis: Diese EXE-Datei ist für Windows-PCs.\n\nAuf Mobilgeräten kann die Datei nicht ausgeführt werden.\n\nBitte besuchen Sie diese Seite von einem Windows-Computer aus.');
+            }
+        };
+        
+        // Fallback für verschiedene Browser
+        function downloadLauncher() {
+            // Versuche verschiedene Methoden
+            try {
+                // Methode 1: Fetch mit Fortschritt
+                downloadWithFetch();
+            } catch (e1) {
+                try {
+                    // Methode 2: Einfacher Download
+                    simpleDownload();
+                } catch (e2) {
+                    // Methode 3: Direkter Link
+                    window.location.href = downloadUrl;
+                }
+            }
+        }
+        
+        // Standard-Download-Funktion (für Button)
+        window.downloadLauncher = downloadLauncher;
+        
+        // Direkter Aufruf wenn ?download in URL
+        if (window.location.search.includes('?download')) {
+            setTimeout(downloadLauncher, 1000);
+        }
+    </script>
+</body>
+</html>

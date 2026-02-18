@@ -1,0 +1,60 @@
+[[redirects]]
+  from = "/index.html"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/aboutus.html"
+  to = "/aboutus.html"
+  status = 200
+
+[[redirects]]
+  from = "/team.html"
+  to = "/team.html"
+  status = 200
+
+[[redirects]]
+  from = "/games.html"
+  to = "/games.html"
+  status = 200
+
+[[redirects]]
+  from = "/shop.html"
+  to = "/shop.html"
+  status = 200
+
+[[redirects]]
+  from = "/login.html"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/register.html"
+  to = "/register.html"
+  status = 200
+
+[[redirects]]
+  from = "/profile.html"
+  to = "/profile.html"
+  status = 200
+
+[[redirects]]
+  from = "/shopadmin.html"
+  to = "/shopadmin.html"
+  status = 200
+
+[[redirects]]
+  from = "/live-event.html"
+  to = "/live-event.html"
+  status = 200
+
+[[redirects]]
+  from = "/error.html"
+  to = "/error.html"
+  status = 200
+
+# ALLE anderen URLs zur Error-Seite
+[[redirects]]
+  from = "/*"
+  to = "/error.html"
+  status = 404

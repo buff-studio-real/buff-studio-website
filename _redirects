@@ -1,0 +1,17 @@
+# Erfolgreiche Seiten (200)
+/index.html         200
+/aboutus.html       200
+/team.html          200
+/games.html         200
+/shop.html          200
+/login.html         200
+/register.html      200
+/profile.html       200
+/shopadmin.html     200
+/live-event.html    200
+/error.html         200
+
+# ALLE anderen Pfade zur Error-Seite (404)
+/*    /error.html   404
+
+/profiles/*  /profile.html?user=:splat  200

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team - Buff Studio</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        .employee-of-month {
+            text-align: center;
+            margin: 30px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        .employee-badge {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .team-card {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .team-card.employee-of-month-card {
+            border: 3px solid #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            background: rgba(30, 30, 30, 0.9);
+            transform: scale(1.05);
+        }
+
+        .employee-badge-small {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .team-card.employee-of-month-card:hover {
+            border-color: #FFD700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            transform: scale(1.05) translateY(-5px);
+        }
+
+        .card-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            border: 3px solid rgba(102, 126, 234, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .team-card.employee-of-month-card .card-photo {
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .card-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-name {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-role {
+            color: #667eea;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .setup-hint {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .setup-hint a {
+            color: #667eea;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .setup-hint a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+   
+<nav>
+    <ul>
+        <li><a href="index.html">Startseite</a></li>
+        <li><a href="aboutus.html">Über uns</a></li>
+        <li><a href="team.html">Unser Team</a></li>
+        <li><a href="games.html">Spiele</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <!-- Admin Link - wird nur für Admins angezeigt -->
+        <li id="adminNavItem" style="display: none;">
+            <a href="shopadmin.html" style="color: #FFD700;">Admin</a>
+        </li>
+        <!-- Live Event Button - wird nur bei aktiven Events angezeigt -->
+        <li id="liveEventNavItem" style="display: none;">
+            <a href="javascript:void(0)" style="color: #ff4757; font-weight: bold; animation: pulse 2s infinite;">
+                🔴 LIVE Event
+            </a>
+        </li>
+        <li class="login-nav-item">
+            <!-- Wird durch JavaScript gefüllt -->
+        </li>
+        <li class="balance-nav-item" style="display: none;">
+            <a href="javascript:void(0)" style="color: #FFD700; font-weight: bold;">
+                💰 <span id="navBalance">0,00</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<style>
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+</style>
+
+    <a href="https://buffstudio.netlify.app/"><img src="img/logo.png" class="scroll-follow-image" alt="Buff Studios Logo"></a>
+    
+    <h1 class="buffstudio-logotext">Unser Team</h1>
+    <p class="buffstudio-centergreytext">Das ist unser Team</p>
+
+    <!-- Mitarbeiter des Monats Anzeige -->
+    <div class="employee-of-month">
+        <div class="employee-badge" id="employeeOfMonthBadge">
+            🏆 Mitarbeiter des Monats: <span id="employeeOfMonthName">Lade...</span>
+        </div>
+        
+        <!-- Hinweis für Setup -->
+        <div class="setup-hint" id="setupHint" style="display: none;">
+            <p><strong>⚠️ Noch kein Mitarbeiter des Monats gewählt!</strong></p>
+            <p>Gehe zur <a href="shopadmin.html">Admin-Seite</a> und wähle den ersten Mitarbeiter des Monats aus.</p>
+        </div>
+    </div>
+
+    <!-- Team Grid mit allen Mitgliedern -->
+    <section class="games-container">
+        <div class="team-grid" aria-label="Unser Team">
+            <article class="team-card" data-name="Max">
+                <div class="card-photo">
+                    <img src="img/max.jpg" alt="Profilbild Max" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Max</h3>
+                    <p class="card-role">Inhaber und 3D Modeller</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Lars">
+                <div class="card-photo">
+                    <img src="img/lars.jpg" alt="Profilbild Lars" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Lars</h3>
+                    <p class="card-role">Mitinhaber und Entwicklungsabteilungleiter</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Johannes">
+                <div class="card-photo">
+                    <img src="img/johannes.jpg" alt="Profilbild Johannes" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Johannes</h3>
+                    <p class="card-role">Design Abteilungsleiter</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Kaleo">
+                <div class="card-photo">
+                    <img src="img/kaleo.jpg" alt="Profilbild Kaleo" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Kaleo</h3>
+                    <p class="card-role">Designer</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Taylor">
+                <div class="card-photo">
+                    <img src="img/taylor.jpg" alt="Profilbild Taylor" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Taylor</h3>
+                    <p class="card-role">Tester und Designer</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Silviu">
+                <div class="card-photo">
+                    <img src="img/silviu.jpg" alt="Profilbild Silviu" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Silviu</h3>
+                    <p class="card-role">Entwickler und Test-Abteilungsleiter</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Larissa">
+                <div class="card-photo">
+                    <img src="img/larissa.jpg" alt="Profilbild Larissa" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Larissa</h3>
+                    <p class="card-role">Entwickler und Designer</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Alessio">
+                <div class="card-photo">
+                    <img src="img/alessio.jpg" alt="Profilbild Alessio" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Alessio</h3>
+                    <p class="card-role">Tester</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Nikita">
+                <div class="card-photo">
+                    <img src="img/nikita.jpg" alt="Profilbild Nikita" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Nikita</h3>
+                    <p class="card-role">Werbe-Abteilungsleiter und Website Management</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Benedikt">
+                <div class="card-photo">
+                    <img src="img/benedikt.jpg" alt="Profilbild Benedikt" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Benedikt</h3>
+                    <p class="card-role">Designer & Entwicklung</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Roman">
+                <div class="card-photo">
+                    <img src="img/roman.jpg" alt="Profilbild Roman" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Roman</h3>
+                    <p class="card-role">Tester</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Sandro">
+                <div class="card-photo">
+                    <img src="img/sandro.jpg" alt="Profilbild Sandro" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Sandro</h3>
+                    <p class="card-role">Designer und Tester</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Kristjan">
+                <div class="card-photo">
+                    <img src="img/kristijan.jpg" alt="Profilbild Kristijan" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Kristijan</h3>
+                    <p class="card-role">Tester</p>
+                </div>
+            </article>
+
+            <article class="team-card" data-name="Benno">
+                <div class="card-photo">
+                    <img src="img/benno.jpg" alt="Profilbild Benno" onerror="this.src='img/placeholder.jpg'">
+                </div>
+                <div class="card-info">
+                    <h3 class="card-name">Benno</h3>
+                    <p class="card-role">Tester</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://rxalirtnxbspphoiriux.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4YWxpcnRueGJzcHBob2lyaXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMDE1ODMsImV4cCI6MjA3NzY3NzU4M30.cepc0jFeVYDwU1k0-qt66Sdig7iVUdqTkvtbGu6jrHY';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Team Seite startet...');
+            loadEmployeeOfMonth();
+        });
+
+        async function loadEmployeeOfMonth() {
+            const employeeNameElement = document.getElementById('employeeOfMonthName');
+            const setupHint = document.getElementById('setupHint');
+            
+            try {
+                console.log('1. Initialisiere Supabase...');
+                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                console.log('2. Lade von Supabase...');
+                const { data, error } = await supabase
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'employee_of_month')
+                    .single();
+
+                console.log('3. Supabase Response:', { data, error });
+
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        // Keine Daten gefunden - zeige Setup-Hinweis
+                        console.log('❌ Keine Mitarbeiter-Daten in Supabase gefunden');
+                        employeeNameElement.textContent = 'Noch nicht gewählt';
+                        setupHint.style.display = 'block';
+                        return;
+                    }
+                    throw error;
+                }
+
+                if (data && data.value) {
+                    console.log('✅ Erfolg! Mitarbeiter:', data.value);
+                    localStorage.setItem('employee_of_month', data.value);
+                    updateEmployeeDisplay(data.value);
+                    setupHint.style.display = 'none';
+                } else {
+                    console.log('❌ Kein Mitarbeiter in der Datenbank');
+                    employeeNameElement.textContent = 'Noch nicht gewählt';
+                    setupHint.style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error('❌ Fehler:', error);
+                
+                // Fallback: LocalStorage
+                const localEmployee = localStorage.getItem('employee_of_month');
+                if (localEmployee) {
+                    console.log('⚠️ Fallback: LocalStorage:', localEmployee);
+                    updateEmployeeDisplay(localEmployee);
+                } else {
+                    console.log('⚠️ Keine Daten verfügbar');
+                    employeeNameElement.textContent = 'Noch nicht gewählt';
+                    setupHint.style.display = 'block';
+                }
+            }
+        }
+
+        function updateEmployeeDisplay(employeeName) {
+            console.log('🎯 Aktualisiere Anzeige für:', employeeName);
+            
+            const employeeNameElement = document.getElementById('employeeOfMonthName');
+            employeeNameElement.textContent = employeeName;
+            
+            const cards = document.querySelectorAll('.team-card');
+            let found = false;
+            
+            cards.forEach(card => {
+                card.classList.remove('employee-of-month-card');
+                const oldBadge = card.querySelector('.employee-badge-small');
+                if (oldBadge) oldBadge.remove();
+                
+                if (card.getAttribute('data-name') === employeeName) {
+                    card.classList.add('employee-of-month-card');
+                    const badge = document.createElement('div');
+                    badge.className = 'employee-badge-small';
+                    badge.textContent = '🏆';
+                    card.appendChild(badge);
+                    found = true;
+                }
+            });
+            
+            if (!found) {
+                console.warn('⚠️ Mitarbeiter nicht gefunden:', employeeName);
+            }
+        }
+
+        // Manuell einen Mitarbeiter setzen (für Testing)
+        window.setTestEmployee = function(name) {
+            console.log('🧪 Setze Test-Mitarbeiter:', name);
+            localStorage.setItem('employee_of_month', name);
+            updateEmployeeDisplay(name);
+        };
+    </script>
+</body>
+</html>

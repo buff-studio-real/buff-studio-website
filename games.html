@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiele - Buff Studio</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        .games-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .game-card {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-art {
+            flex: 0 0 200px;
+        }
+
+        .game-art img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .game-info {
+            flex: 1;
+        }
+
+        .game-info h3 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .game-info p {
+            color: #ccc;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .help-button-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .help-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .help-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .help-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30,30,30,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .close-help {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .help-modal-content h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .help-modal-content p {
+            color: whitesmoke;
+            margin-bottom: 15px;
+        }
+
+        .contact-info {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .contact-info p {
+            margin: 8px 0;
+        }
+
+        .help-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .help-links a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            text-align: center;
+            transition: background 0.3s ease;
+        }
+
+        .help-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+<nav>
+    <ul>
+        <li><a href="index.html">Startseite</a></li>
+        <li><a href="aboutus.html">Über uns</a></li>
+        <li><a href="team.html">Unser Team</a></li>
+        <li><a href="games.html">Spiele</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <!-- Admin Link - wird nur für Admins angezeigt -->
+        <li id="adminNavItem" style="display: none;">
+            <a href="shopadmin.html" style="color: #FFD700;">Admin</a>
+        </li>
+        <!-- Live Event Button - wird nur bei aktiven Events angezeigt -->
+        <li id="liveEventNavItem" style="display: none;">
+            <a href="javascript:void(0)" style="color: #ff4757; font-weight: bold; animation: pulse 2s infinite;">
+                🔴 LIVE Event
+            </a>
+        </li>
+        <li class="login-nav-item">
+            <!-- Wird durch JavaScript gefüllt -->
+        </li>
+        <li class="balance-nav-item" style="display: none;">
+            <a href="javascript:void(0)" style="color: #FFD700; font-weight: bold;">
+                💰 <span id="navBalance">0,00</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<style>
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+</style>
+
+    <a href="https://buffstudio.netlify.app/"><img src="img/logo.png" class="scroll-follow-image" alt="Buff Studios Logo"></a>
+
+    <h1 class="buffstudio-logotext">Spiele</h1>
+    <p class="buffstudio-centergreytext">Hier sind die Spiele, an denen wir arbeiten.</p>
+
+    <section class="games-container">
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 32px;">Unsere Projekte</h2>
+
+        <article class="game-card">
+            <div class="game-art">
+                <img src="img/gunfighter.jpg" alt="GunFighter Cover" onerror="this.style.display='none'">
+            </div>
+            <div class="game-info">
+                <h3>GunFighter</h3>
+                <p>GunFighter ist unser aktuelles Projekt — ein rasantes Mehrspieler-Shooter-Spiel mit atemberaubender Grafik und spannenden Gameplay-Mechaniken. Tauche ein in eine Welt voller Action und strategischer Herausforderungen.</p>
+            </div>
+        </article>
+    </section>
+
+    <!-- Hilfe Button -->
+    <div class="help-button-container">
+        <button class="help-button" onclick="openHelp()">Du brauchst Hilfe?</button>
+    </div>
+
+    <!-- Hilfe Modal -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-content">
+            <button class="close-help" onclick="closeHelp()">&times;</button>
+            <h3>Hilfe & Support</h3>
+            <p>Bei Problemen oder Fragen kontaktiere uns:</p>
+            <div class="contact-info">
+                <p><strong>Email:</strong> supbuffstudios@outlook.com</p>
+            </div>
+            <div class="help-links">
+                <a href="team.html">Unser Team</a>
+                <a href="aboutus.html">Über Uns</a>
+                <a href="games.html">Unsere Spiele</a>
+                <a href="shop.html">Shop</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="common.js"></script>
+
+    <script>
+        // Hilfe Modal Funktionen
+        function openHelp() {
+            document.getElementById('helpModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Schließen beim Klick außerhalb
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('helpModal');
+            if (e.target === modal) {
+                closeHelp();
+            }
+        });
+
+        // Schließen mit Escape-Taste
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const helpModal = document.getElementById('helpModal');
+                if (helpModal.style.display === 'block') {
+                    closeHelp();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
